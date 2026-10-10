@@ -1,0 +1,2 @@
+anthropic>=1.13,<2
+streamlit>=1.50,<2

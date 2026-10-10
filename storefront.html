@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pink Lemonade Shop Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<style>
+/* Layout: a boutique storefront (announcement bar, logo, nav, product grid) with a floating shop-assistant chat in the corner */
+:root{
+  --bg:#fffafb; --surface:#ffffff; --blush:#fbe3ea; --pink:#e8668f; --pink-ink:#b2325f;
+  --lemon:#f6dc6b; --ink:#3b2530; --muted:#86707a; --line:#f0d6de; --ok:#2f7d55; --out:#b0a3a8;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow:0 10px 30px rgba(178,50,95,.16);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1f1519; --surface:#2a1d22; --blush:#3a2530; --pink:#f08aab; --pink-ink:#f6a9c1;
+  --lemon:#e9cf5c; --ink:#f7e9ee; --muted:#bfa6b0; --line:#463039; --ok:#7fd1a4; --out:#7d6b72;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1f1519; --surface:#2a1d22; --blush:#3a2530; --pink:#f08aab; --pink-ink:#f6a9c1;
+  --lemon:#e9cf5c; --ink:#f7e9ee; --muted:#bfa6b0; --line:#463039; --ok:#7fd1a4; --out:#7d6b72;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+a{color:inherit}
+.announce{background:var(--pink);color:#fff;text-align:center;font-weight:700;font-size:13px;letter-spacing:.04em;padding:8px 16px}
+.demo-flag{background:var(--lemon);color:#3b2530;text-align:center;font-size:13px;padding:6px 16px}
+header{border-bottom:1px solid var(--line);background:var(--surface)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.brandrow{display:flex;flex-direction:column;align-items:center;gap:2px;padding-block:22px 10px}
+.logo{font-family:var(--display);font-size:clamp(34px,6vw,52px);color:var(--pink-ink);line-height:1;margin:0;font-weight:400}
+.logo span{display:inline-block;width:.42em;height:.42em;border-radius:50%;background:var(--lemon);margin-left:.12em;vertical-align:.45em}
+.tag{color:var(--muted);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 22px;padding-block:10px 14px;font-size:14px;font-weight:600}
+nav a{text-decoration:none;padding:2px 0;border-bottom:2px solid transparent}
+nav a:hover{border-color:var(--pink)}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;padding-block:28px}
+.hero h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,38px);line-height:1.15;margin:0 0 10px;text-wrap:balance}
+.hero p{margin:0 0 16px;color:var(--muted);max-width:52ch}
+.hero-card{background:var(--blush);border-radius:18px;padding:18px 20px}
+.hero-card b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-ink);margin-bottom:8px}
+.hero-card .q{display:block;width:100%;text-align:left;margin-top:8px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:inherit;font-size:14px;cursor:pointer}
+
+.btn{background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer}
+.dark-text{color:var(--bg)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding-block:6px 14px}
+.toolbar h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--pink-ink);border-color:var(--pink-ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px 16px;padding-bottom:60px}
+.card{display:flex;flex-direction:column;gap:6px;min-width:0}
+.swatch{aspect-ratio:4/5;max-width:100%;border-radius:14px;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+.swatch .mono{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:56px;color:rgba(255,255,255,.75)}
+.swatch .badge{position:relative;background:rgba(255,255,255,.92);color:#3b2530;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:3px 7px}
+.vendor{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pname{font-weight:600;line-height:1.3}
+.price{font-variant-numeric:tabular-nums;font-weight:700;color:var(--pink-ink)}
+.sizes{display:flex;flex-wrap:wrap;gap:4px}
+.sz{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-variant-numeric:tabular-nums}
+.sz.out{color:var(--out);text-decoration:line-through}
+footer{border-top:1px solid var(--line);background:var(--surface);padding-block:28px;font-size:13px;color:var(--muted)}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+footer b{color:var(--ink);display:block;margin-bottom:4px}
+
+/* chat */
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:8px;background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:inherit;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
+.fab i{width:10px;height:10px;border-radius:50%;background:var(--lemon);display:inline-block}
+.panel{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 120px));background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.phead{background:var(--pink-ink);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.phead strong{font-family:var(--display);font-weight:400;font-size:19px;display:block}
+.phead small{opacity:.85;font-size:12px}
+.phead button{background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.m{max-width:88%;padding:9px 13px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.m.bot{background:var(--blush);align-self:flex-start;border-bottom-left-radius:4px}
+.m.me{background:var(--pink-ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.m.note{align-self:center;background:transparent;color:var(--muted);font-size:12px;text-align:center;padding:2px}
+.sugg{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.sugg button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}
+form.ask{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+form.ask input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:10px 14px;font:inherit;background:var(--bg);color:var(--ink)}
+form.ask button{background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:0 16px;font:inherit;font-weight:700;cursor:pointer}
+.mode{font-size:11px;color:var(--muted);text-align:center;padding:0 10px 8px}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+@media (max-width:720px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.swatch .mono{font-size:40px}}
+@media (prefers-reduced-motion:no-preference){.panel{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:.6}}}
+</style>
+</head>
+<body>
+
+<div class="announce">Free shipping on orders over $100</div>
+<div class="demo-flag"><b>Staff preview.</b> This is a test copy of pinklemonademi.com with the new shop assistant added. Nothing here can be purchased.</div>
+<header>
+  <div class="wrap">
+    <div class="brandrow">
+      <h1 class="logo">Pink Lemonade<span></span></h1>
+      <div class="tag">Children · Home · Her</div>
+    </div>
+    <nav aria-label="Shop">
+      <a href="#shop" data-cat="New">New Arrivals</a>
+      <a href="#shop" data-cat="Baby">Baby</a>
+      <a href="#shop" data-cat="Girl">Girl</a>
+      <a href="#shop" data-cat="Boy">Boy</a>
+      <a href="#shop" data-cat="Play">Play</a>
+      <a href="#shop" data-cat="Holiday">Holiday</a>
+      <a href="#shop" data-cat="Her">Gift Shop</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h2>Ask us anything, any time.</h2>
+      <p>Our new shop assistant knows what's on the shelves right now: which sizes are left, what's new from Rylee + Cru and Jellycat, and how shipping works. Try it in the chat beside the shop.</p>
+      <p class="btn" style="display:inline-block;margin:0">Ask in the chat beside the shop</p>
+    </div>
+    <div class="hero-card">
+      <b>Customers ask things like</b>
+      <div class="q">“Do you have the Fran Dress Holiday Plaid in 4-5Y?”</div>
+      <div class="q">“What Jellycat do you have under $30?”</div>
+      <div class="q">“I need a baby shower gift around $40. Ideas?”</div>
+      <div class="q">“Is the Periwinkle sequin dress available in 7/8Y?”</div>
+    </div>
+  </section>
+
+  <section id="shop">
+    <div class="toolbar">
+      <h3 id="shopTitle">Shop all</h3>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div><b>Pink Lemonade</b>A family-owned boutique with four brick-and-mortar locations in Michigan. Cute things for children, home and her.</div>
+    <div><b>Follow along</b>Instagram and Facebook: @pinklemonadegr</div>
+    <div><b>About this preview</b>Products, prices and sizes copied from the live shop on October 10, 2026. Photos are left out of this copy; color tiles stand in for them.</div>
+  </div>
+</footer>
+
+
+<script>
+// Catalog snapshot from pinklemonademi.com (Shopify /products.json), Oct 10 2026.
+// [title, brand, price, category, inStock sizes, soldOut sizes, color]
+const P = [
+["Raw Edge Long Sleeve Tee Wonderful World","Rylee + Cru",42.95,"Baby,Girl,Boy,New","3-6M|6-12M|12-18M|18-24M|2-3Y","","#8a96a3"],
+["Pocketed Flannel Shirt Holiday Plaid","Rylee + Cru",58.95,"Baby,Boy,Holiday,New","6-12M|12-18M|18-24M|2-3Y|4-5Y","","#3f6b52"],
+["Palmer Pant Holiday Plaid","Rylee + Cru",52.95,"Baby,Holiday,New","3-6M|6-12M|12-18M|18-24M|2-3Y","","#3f6b52"],
+["Organic Long John Pajamas Holly Fleur","Rylee + Cru",48.95,"Baby,Holiday,New","0-3M|3-6M|6-12M|12-18M|18-24M","","#c9a98b"],
+["Organic Long John Pajamas Gingerbread","Rylee + Cru",48.95,"Baby,Holiday,New","0-3M|3-6M|6-12M|12-18M|18-24M","","#b98a5e"],
+["Noel Stocking Ruby Plaid","Rylee + Cru",38.95,"Holiday,Home,New","One size","","#a8324a"],
+["Noel Stocking Candy Cane Lane","Rylee + Cru",38.95,"Holiday,Home,New","One size","","#c96f7d"],
+["Noel Stocking Holiday Floral","Rylee + Cru",38.95,"Holiday,Home,New","One size","","#cbb59a"],
+["Oliver Pant Toffee","Rylee + Cru",55.95,"Boy,New","2-3Y|4-5Y|6-7Y","","#9a6a43"],
+["Lucian Pant Toffee","Rylee + Cru",55.95,"Baby,Boy,New","0-3M|3-6M|6-12M|12-18M|18-24M|2-3Y","","#9a6a43"],
+["Fuzzy Cardigan Ruby","Rylee + Cru",66.95,"Girl,Holiday,New","12-18M|18-24M|2-3Y|4-5Y|6-7Y","","#a8324a"],
+["Little Knot Headband Vintage Plaid","Rylee + Cru",12.95,"Baby,Girl,Holiday","One size","","#b0545f"],
+["Freya Romper Holiday Plaid","Rylee + Cru",65.95,"Baby,Holiday,New","0-3M|3-6M|6-12M|12-18M|18-24M","","#3f6b52"],
+["Long Sleeve Tee Santa","Rylee + Cru",39.95,"Baby,Holiday,New","0-3M|3-6M|6-12M|12-18M|18-24M|2-3Y","","#d8c6ad"],
+["Freya Romper Bows","Rylee + Cru",58.95,"Baby,Girl,Holiday,New","0-3M|3-6M|6-12M|12-18M|18-24M","","#a8324a"],
+["Fran Dress Holiday Plaid","Rylee + Cru",88.95,"Girl,Holiday,New","2-3Y|4-5Y|6-7Y|8-9Y","","#3f6b52"],
+["Fran Dress Bows","Rylee + Cru",88.95,"Girl,Holiday,New","2-3Y|4-5Y|6-7Y|8-9Y","","#a8324a"],
+["Ruffle Collar Dress Ruby Bloom","Rylee + Cru",58.95,"Baby,Girl,New","0-3M|3-6M|6-12M|12-18M|18-24M|2-3Y","","#d9c7b4"],
+["Relaxed Sweatshirt Merry & Bright","Rylee + Cru",52.95,"Baby,Girl,Boy,Holiday,New","3-6M|6-12M|12-18M|18-24M|2-3Y|4-5Y","","#a8324a"],
+["Chenille Blush Vest","Angel Dear",42.95,"Girl,New","2T|3T|4T|5-6Y|7-8Y","","#e7b7bd"],
+["Meowdy Boxy Tee","Tiny Whales",32.95,"Girl","2T|3T|4T|5|6|7","","#d78f9c"],
+["Hold Your Horses L/S Tee","Tiny Whales",38.95,"Girl","2T|3T|4T|5|6|7|8","","#c79a6d"],
+["Cotton Candy Lined Sherpa Jacket","Tiny Whales",71.95,"Girl","4T|5|7|8|10","6","#f1b6c9"],
+["L/S 2-Piece Set, Pink Teddy Picnic","Spearmint Love",34.95,"Baby,Girl","18-24M|2|3|4|5","","#f0aebf"],
+["L/S 2-Piece Set, Coquette Cherries","Spearmint Love",34.95,"Baby,Girl","12-18M|18-24M|2T|3|4|5|6","","#c8414f"],
+["Mayoral Girl Sweatpants","Mayoral",36.95,"Girl","2|3|4|5|6|7|8","","#b7a7b3"],
+["Ombre Puff Sleeve Sequin Dress","Mila & Rose",52.95,"Girl","2Y|3Y|4Y|5/6Y|7/8Y","","#d58fc0"],
+["Vintage Pink Velvet Dress","Mila & Rose",34.95,"Baby,Girl,Holiday","6-12M|12-24M|2Y|3Y|4Y|5/6Y|7/8Y","","#d87f97"],
+["Party Time Ruffle Dress","Mila & Rose",30.95,"Baby,Girl","12-24M|2Y|3Y|4Y|5/6Y","","#e99ab0"],
+["Neon Pink Puff Sleeve Sequin Dress","Mila & Rose",52.95,"Girl","2Y|3Y|4Y|5/6Y|7/8Y","","#ec4f94"],
+["Periwinkle Heart Puff Sequin Dress","Mila & Rose",52.95,"Girl","2Y|3Y|4Y|5/6Y","7/8Y","#8e95d9"],
+["Pink Rainbow Puff Sleeve Dress","Mila & Rose",52.95,"Girl","2Y|3Y|4Y|5/6Y","7/8Y","#f29bb6"],
+["Leopard Rib Lettuce Edge Tunic Top","Angel Dear",32.95,"Baby,Girl","6-12M|12-18M|18-24M|2T|3T","4T","#b88d62"],
+["Leopard French Terry Cargo Pants","Angel Dear",36.95,"Baby,Girl","6-12M|12-18M|18-24M|4T","2T|3T","#b88d62"],
+["Fox Bitsy Crinkle Sensory Toy Teether","Itzy Ritzy",18.95,"Baby,Play","One size","","#d9824a"],
+["CozyChic Bear Buddie, Cream","Barefoot Dreams",46.95,"Baby,Play","One size","","#e6dccd"],
+["Heirloom Floral Blanket, Dusty Rose","Barefoot Dreams",89.95,"Baby,Home","One size","","#d7a3a6"],
+["CozyChic Touchdown Buddie","Barefoot Dreams",58.95,"Baby,Play","One size","","#8b6a4f"],
+["Hi Pecan Crewneck Sweater","Huggalugs",48.95,"Baby","12-18M","0-6M|6-12M","#a07650"],
+["Tee Time Golf Silicone Teether","Calla & Friends",14.95,"Baby,Play","One size","","#8fbf8a"],
+["Nursery Magic Cream Modal Footie","Magnetic Me",40.00,"Baby","NB|0-3M|6-9M","3-6M","#efe3cf"],
+["Bamboo Baby Gown + Hat Set Bloom","Rylee + Cru",36.95,"Baby","One size","","#e8d8c6"],
+["Thanksgiving Friends (book)","Penguin Random House",7.99,"Play,Baby","One size","","#d39a4a"],
+["Itzy Snack Pal Snack Cup","Itzy Ritzy",11.95,"Baby","Bear|Kitty","","#c9a98b"],
+["Mallard Duck Bitzy Crinkle","Itzy Ritzy",18.95,"Baby,Play","One size","","#4f8a6b"],
+["Pretty Bows Swaddle Blanket","Angel Dear",30.95,"Baby","One size","","#f2dfe2"],
+["Bella Rose Stripe Swaddle Blanket","Angel Dear",30.95,"Baby","One size","","#ef9fb2"],
+["Blue Bows and Flowers Swaddle Blanket","Angel Dear",30.95,"Baby","One size","","#8fb0d8"],
+["Bestie Dogs Pink Swaddle Blanket","Angel Dear",30.95,"Baby","One size","","#f2b4c3"],
+["Bows and Hearts Swaddle Blanket","Angel Dear",30.95,"Baby","One size","","#f0c4cd"],
+["Mon Ami Azure Elephant","Mon Ami",36.95,"Baby,Play","One size","","#7ea7cf"],
+["You're My Little Mama Bear (book)","Simon & Schuster",9.99,"Baby,Play","One size","","#b98a5e"],
+["First Words (book)","Simon & Schuster",9.99,"Baby,Play","One size","","#6fa3c9"],
+["Itzy Ring Pal","Itzy Ritzy",12.95,"Baby,Play","Pink Kitty|Taupe Bear","","#e7b3c0"],
+["Ulrich Wolf","Jellycat",83.00,"Play,Holiday","One size","","#9aa0a8"],
+["Amuseables Perta Snow Boot","Jellycat",70.00,"Play,Holiday","One size","","#c9c3d6"],
+["Amuseables Fitswell Mitten","Jellycat",43.00,"Play,Holiday","One size","","#c7525f"],
+["Amuseables Mullover Spiced Drink","Jellycat",45.00,"Play,Holiday","One size","","#a8463e"],
+["Amuseables Silver Star","Jellycat",35.00,"Play,Holiday","One size","","#b9bcc4"],
+["Munro Scottie Dog Winter Jumper","Jellycat",60.00,"Play,Holiday","One size","","#3b3b40"],
+["Amuseables Pomilly","Jellycat",55.00,"Play","One size","","#e6a0b2"],
+["Amuseables Happy Boiled Egg","Jellycat",23.00,"Play","One size","","#f2d36b"],
+["Growlston Gargoyle","Jellycat",45.00,"Play","One size","","#8f9296"],
+["Amuseables Vampop Drink","Jellycat",45.00,"Play","One size","","#7a3f6e"],
+["Amuseables Garlic","Jellycat",30.00,"Play","One size","","#e8e1cf"],
+["Ghost Bob","Jellycat",28.00,"Play","One size","","#d9dade"],
+["Amuseables Flickerty Candle","Jellycat",28.00,"Play","One size","","#f0c56a"],
+["Rufferty Puppy Wizard Outfit","Jellycat",70.00,"Play","One size","","#5b4a8a"],
+["Pinchsnap Crab","Jellycat",60.00,"Play","One size","","#e0684f"],
+["Bashful Giraffe Blankie","Jellycat",80.00,"Baby,Play","One size","","#e8c27a"],
+["If I Were a Puppy (board book)","Jellycat",16.00,"Baby,Play","One size","","#c79a6d"],
+["If I Were an Octopus (board book)","Jellycat",16.00,"Baby,Play","One size","","#d77f9a"],
+["If I Were a Bunny (board book)","Jellycat",16.00,"Baby,Play","One size","","#e3c9b7"],
+["Bartholomew Bear Shoulder Bag","Jellycat",40.00,"Play","One size","","#9a6a43"],
+["Amuseables Croissant","Jellycat",25.00,"Play","One size","","#d9a259"],
+["Amuseables Peanut Star Student Outfit","Jellycat",30.00,"Play","One size","","#7f90b8"],
+["Amuseables Mirielle St. Honoré Cake","Jellycat",38.00,"Play","One size","","#f1c9d4"],
+["Amuseables Pair of Olives","Jellycat",45.00,"Play","One size","","#7c8a4a"],
+["Amuseables Margaux Madeleine","Jellycat",28.00,"Play","One size","","#e3b773"],
+["Amuseables Carole Canelé","Jellycat",25.00,"Play","One size","","#9b5a35"],
+["Amuseables Sweetcorn","Jellycat",55.00,"Play","One size","","#efcf54"],
+["Quilted Ruffle Tote, Maggie's Bouquet","Lilly Pulitzer",60.95,"Her","One size","","#ef7fa6"],
+["Quilted Ruffle Pouch, Maggie's Bouquet","Lilly Pulitzer",34.95,"Her","One size","","#ef7fa6"],
+["Coin Purse, Caning with Monkey","Lilly Pulitzer",19.95,"Her","One size","","#58b5b0"],
+["Multicolor Dilly Dally Hair Clip","Etta & East",18.00,"Her","One size","","#e59bc1"],
+["Multicolor Mother Hair Clip","Etta & East",18.00,"Her","One size","","#9fc6e0"],
+["How Lucky Are We Sweatshirt","Etta & East",78.95,"Her","S/M|L/XL","","#d6c2a6"],
+["Mahjong Wine Charms","Two's Company",28.95,"Her,Home","One size","","#3f7d6a"],
+["Cream, Gold, Green & Gray Pom Hat","Panache",26.95,"Her,Holiday","One size","","#cdbf9c"],
+["Cream & Pink Floral Mittens","Panache",26.95,"Her,Holiday","One size","","#efc6cc"],
+["Cream & Pink Floral Pom Hat","Panache",26.95,"Her,Holiday","One size","","#efc6cc"],
+["Polka Dot Sherpa","Buttermelon",68.95,"Her","S|L","M","#efe6da"],
+["Mallard Duck Pullover","Sunday Edition",58.95,"Her","Lavender, L","Green; sizes S and M","#b8a6d6"],
+["Teddy Floral Pouch","The Darling Effect",20.95,"Her","One size","","#e7c3b5"],
+["Claw Clip, Maple Gingham","The Darling Effect",13.95,"Her","One size","","#b5643d"],
+["Word Up Claw Clip, Bridal","The Darling Effect",13.95,"Her","One size","","#f2ece4"]
+].map(([title,brand,price,cats,inS,outS,color],i)=>({id:i,title,brand,price,cats:cats.split(","),inStock:inS?inS.split("|"):[],soldOut:outS?outS.split("|"):[],color}));
+
+
+
+// ---------- storefront ----------
+const CATS=[["All","Shop all"],["New","New Arrivals"],["Baby","Baby"],["Girl","Girl"],["Boy","Boy"],["Play","Play & Jellycat"],["Holiday","Holiday"],["Her","Gifts for Her"]];
+let cur="All";
+const grid=document.getElementById("grid"), chips=document.getElementById("chips");
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderChips(){chips.innerHTML=CATS.map(([k,l])=>`<button class="chip" type="button" data-k="${k}" aria-pressed="${k===cur}">${l}</button>`).join("")}
+function renderGrid(){
+  const list=P.filter(p=>cur==="All"||p.cats.includes(cur));
+  document.getElementById("shopTitle").textContent=(CATS.find(c=>c[0]===cur)||[])[1]+` (${list.length})`;
+  grid.innerHTML=list.map(p=>{
+    const sizes=p.inStock[0]==="One size"?"":`<div class="sizes">${p.inStock.map(s=>`<span class="sz">${esc(s)}</span>`).join("")}${p.soldOut.map(s=>`<span class="sz out" title="Sold out">${esc(s)}</span>`).join("")}</div>`;
+    const badge=p.soldOut.length?'<span class="badge">Some sizes sold out</span>':(p.cats.includes("New")?'<span class="badge">New</span>':"");
+    return `<article class="card"><div class="swatch" style="background:linear-gradient(160deg,${p.color},${p.color}cc)"><span class="mono">${esc(p.brand[0])}</span>${badge}</div>
+      <div class="vendor">${esc(p.brand)}</div><div class="pname">${esc(p.title)}</div><div class="price">$${p.price.toFixed(2)}</div>${sizes}</article>`}).join("");
+}
+chips.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cur=b.dataset.k;renderChips();renderGrid()});
+document.querySelectorAll("nav a").forEach(a=>a.addEventListener("click",()=>{cur=a.dataset.cat;renderChips();renderGrid()}));
+renderChips();renderGrid();
+
+</script>
+</body>
+</html>
