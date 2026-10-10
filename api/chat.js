@@ -4,7 +4,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 const ORIGIN = process.env.STORE_ORIGIN || "https://pinklemonademi.com";
-const keyName = Object.keys(process.env).find((k) => k.trim().toUpperCase() === "ANTHROPIC_API_KEY");
+const keyName = Object.keys(process.env).find((k) => ["ANTHROPIC_API_KEY", "ANTHROPIC_KEY"].includes(k.trim().toUpperCase()));
 const client = new Anthropic({ apiKey: keyName ? process.env[keyName].trim() : undefined }); // key from the host's environment settings
 
 const SYSTEM = `You are the friendly shop assistant on the Pink Lemonade boutique website (${ORIGIN}).
