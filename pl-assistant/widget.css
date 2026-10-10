@@ -24,3 +24,7 @@
 .pla-form button{background:var(--pla-pink);color:#fff;border:0;border-radius:999px;padding:0 16px;font:700 14px system-ui,sans-serif;cursor:pointer}
 #pla-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483003;background:var(--pla-ink);color:#fff;padding:10px 16px;border-radius:12px;font:14px system-ui,sans-serif;max-width:calc(100vw - 32px)}
 #pla-root button:focus-visible,#pla-root input:focus-visible{outline:3px solid var(--pla-lemon);outline-offset:2px}
+/* Her theme styles inputs and buttons in caps with wide spacing; keep the chat in normal text */
+#pla-root, #pla-root *, #pla-root input, #pla-root input::placeholder, #pla-root button, #pla-toast{text-transform:none !important;letter-spacing:normal !important;font-variant:normal !important}
+#pla-root input, #pla-root button{font-family:system-ui,-apple-system,"Segoe UI",sans-serif !important}
+#pla-root .pla-head strong{font-family:Georgia,serif !important}

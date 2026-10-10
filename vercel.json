@@ -10,6 +10,10 @@
   ],
   "rewrites": [
     {
+      "source": "/analytics",
+      "destination": "/pl-assistant/analytics.html"
+    },
+    {
       "source": "/:path((?!api/|pl-assistant/).*)",
       "destination": "/api/proxy?path=/:path"
     }

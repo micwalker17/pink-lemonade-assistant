@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Pink Lemonade Shop Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* Layout: brand header, live headline tiles, a two-column grid of chart cards, then a clearly marked sample section */
+:root{
+  --bg:#fff7f9; --card:#ffffff; --blush:#fde7ee; --pink:#c2416b; --pink-soft:#f3b7c9; --gold:#a57c12;
+  --ink:#3b2530; --muted:#7e6670; --line:#f1d9e1; --grid:#f6e6ec; --lemon:#f6dc6b;
+  --display:"Young Serif", Georgia, serif; --body:"Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+a{color:var(--pink)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+header{background:var(--card);border-bottom:1px solid var(--line)}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:18px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand img{height:54px;width:auto}
+.brand h1{font-family:var(--display);font-weight:400;font-size:clamp(22px,3.4vw,30px);margin:0;color:var(--pink);text-wrap:balance}
+.brand p{margin:0;color:var(--muted);font-size:13px}
+.back{font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--bg)}
+main{padding-block:22px 60px;display:flex;flex-direction:column;gap:22px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.tile .k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tile .v{font-family:var(--display);font-size:30px;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums}
+.tile .s{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;min-width:0}
+.card h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 2px}
+.card .sub{color:var(--muted);font-size:13px;margin:0 0 10px}
+.chart{position:relative;height:280px}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--grid);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip{display:inline-block;font-size:11px;border:1px solid var(--line);border-radius:5px;padding:0 5px;margin:1px;color:var(--muted);text-decoration:line-through}
+.tablebox{overflow-x:auto}
+.section-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-top:8px}
+.section-head h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.flag{background:var(--lemon);color:#3b2530;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px}
+.flag.live{background:#e3f3ea;color:#1f6a43}
+.sample .card{border-style:dashed}
+.note{color:var(--muted);font-size:13px;max-width:70ch;margin:0}
+.state{color:var(--muted);padding:30px;text-align:center}
+@media (max-width:760px){.grid{grid-template-columns:1fr}.chart{height:240px}}
+a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div class="brand">
+      <img src="https://pinklemonademi.com/cdn/shop/files/PL_logo2_1_85f337ad-1105-4740-87e3-ecf529fd7226.png?v=1641681081&width=400" alt="Pink Lemonade">
+      <div><h1>Shop Insights</h1><p id="updated">Loading the live catalog…</p></div>
+    </div>
+    <a class="back" href="/">← Back to the shop</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="section-head"><h3>Catalog right now</h3><span class="flag live">Live from the website</span></div>
+  <section class="tiles" id="tiles" aria-label="Headline numbers"><div class="state">Loading…</div></section>
+
+  <section class="grid">
+    <article class="card"><h2>Biggest brands</h2><p class="sub">Products online, top 10 brands</p><div class="chart"><canvas id="brands" role="img" aria-label="Products per brand"></canvas></div></article>
+    <article class="card"><h2>Selling out fastest</h2><p class="sub">Share of each brand's sizes already sold out online</p><div class="chart"><canvas id="sellout" role="img" aria-label="Sold-out share by brand"></canvas></div></article>
+    <article class="card"><h2>New arrivals</h2><p class="sub">Products added each week, last 12 weeks</p><div class="chart"><canvas id="weekly" role="img" aria-label="Products added per week"></canvas></div></article>
+    <article class="card"><h2>Price mix</h2><p class="sub">Products by starting price</p><div class="chart"><canvas id="prices" role="img" aria-label="Products by price band"></canvas></div></article>
+    <article class="card wide"><h2>Restock watch</h2><p class="sub">Items with the most sizes sold out online</p><div class="tablebox"><table><thead><tr><th>Item</th><th>Brand</th><th>Price</th><th>Sold out</th><th>Sizes left</th></tr></thead><tbody id="restock"><tr><td colspan="5" class="state">Loading…</td></tr></tbody></table></div></article>
+  </section>
+
+  <div class="section-head"><h3>Sales &amp; customers</h3><span class="flag">Sample numbers</span></div>
+  <p class="note">These charts show what this section will look like. The numbers are made up. Real sales and customer figures live in her Shopify admin, and they can be connected with a read-only Shopify access key.</p>
+  <section class="grid sample">
+    <article class="card"><h2>Monthly sales</h2><p class="sub">Sample · online and in-store, 2026</p><div class="chart"><canvas id="s-sales" role="img" aria-label="Sample monthly sales"></canvas></div></article>
+    <article class="card"><h2>New vs returning customers</h2><p class="sub">Sample · orders per month</p><div class="chart"><canvas id="s-cust" role="img" aria-label="Sample new and returning customers"></canvas></div></article>
+    <article class="card"><h2>Sales by location</h2><p class="sub">Sample · share of September sales</p><div class="chart"><canvas id="s-loc" role="img" aria-label="Sample sales by location"></canvas></div></article>
+    <article class="card"><h2>Top categories</h2><p class="sub">Sample · September revenue</p><div class="chart"><canvas id="s-cat" role="img" aria-label="Sample revenue by category"></canvas></div></article>
+  </section>
+</main>
+
+<script>
+const C = { pink: "#c2416b", gold: "#a57c12", soft: "#f3b7c9", ink: "#3b2530", muted: "#7e6670", grid: "#f6e6ec" };
+if (window.Chart) {
+  Chart.defaults.font.family = '"Nunito Sans", system-ui, sans-serif';
+  Chart.defaults.color = C.muted;
+  Chart.defaults.plugins.tooltip.backgroundColor = C.ink;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.legend.labels.color = C.ink;
+}
+const money = (n) => "$" + Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 });
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const axis = (extra = {}) => ({ grid: { color: C.grid }, border: { display: false }, ticks: { color: C.muted }, ...extra });
+const noGrid = { grid: { display: false }, border: { display: false }, ticks: { color: C.ink } };
+function bar(id, labels, data, opts = {}) {
+  return new Chart(document.getElementById(id), {
+    type: "bar",
+    data: { labels, datasets: [{ data, backgroundColor: opts.color || C.pink, borderRadius: 4, borderSkipped: "start", maxBarThickness: 26, label: opts.label || "" }] },
+    options: { indexAxis: opts.horizontal ? "y" : "x", maintainAspectRatio: false, plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: (c) => opts.fmt ? opts.fmt(c.raw) : String(c.raw) } } },
+      scales: opts.horizontal ? { x: axis({ ticks: { color: C.muted, callback: opts.tick } }), y: noGrid } : { x: noGrid, y: axis({ ticks: { color: C.muted, callback: opts.tick } }) } },
+  });
+}
+
+async function live() {
+  let d;
+  try {
+    const r = await fetch("/api/analytics");
+    if (!r.ok) throw new Error();
+    d = await r.json();
+  } catch {
+    document.getElementById("updated").textContent = "The live catalog couldn't load. Refresh to try again.";
+    document.getElementById("tiles").innerHTML = '<div class="state">No live data right now.</div>';
+    return;
+  }
+  const t = d.totals;
+  document.getElementById("updated").textContent = "Live catalog from pinklemonademi.com · updated " + new Date(d.updated).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+  const tiles = [
+    ["Products online", t.products.toLocaleString(), `${t.brands} brands`],
+    ["Sizes in stock", t.sizes_in_stock_pct + "%", `${t.sizes_listed.toLocaleString()} sizes listed`],
+    ["Added in 30 days", t.added_last_30_days.toLocaleString(), "new products"],
+    ["Fully sold out", t.fully_sold_out.toLocaleString(), "products with no sizes left"],
+    ["Typical price", money(t.median_price), "median starting price"],
+    ["On sale", t.on_sale.toLocaleString(), "products marked down"],
+  ];
+  document.getElementById("tiles").innerHTML = tiles.map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+  if (!window.Chart) return;
+  bar("brands", d.top_brands.map((b) => b.brand), d.top_brands.map((b) => b.products), { horizontal: true, fmt: (v) => v + " products" });
+  bar("sellout", d.selling_out.map((b) => b.brand), d.selling_out.map((b) => b.sold_out_pct), { horizontal: true, color: C.gold, fmt: (v) => v + "% of sizes sold out", tick: (v) => v + "%" });
+  new Chart(document.getElementById("weekly"), {
+    type: "line",
+    data: { labels: d.weekly_new.map((w) => new Date(w.week_ending + "T12:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })),
+      datasets: [{ data: d.weekly_new.map((w) => w.added), borderColor: C.pink, backgroundColor: "rgba(194,65,107,.12)", fill: true, tension: .3, borderWidth: 2, pointRadius: 4, pointBackgroundColor: C.pink, pointBorderColor: "#fff", pointBorderWidth: 2 }] },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { title: (i) => "Week ending " + i[0].label, label: (c) => c.raw + " products added" } } }, scales: { x: noGrid, y: axis({ beginAtZero: true }) } },
+  });
+  bar("prices", d.price_bands.map((b) => b.label), d.price_bands.map((b) => b.products), { fmt: (v) => v + " products" });
+  document.getElementById("restock").innerHTML = d.restock.length ? d.restock.map((r) =>
+    `<tr><td><a href="${esc(r.path)}">${esc(r.title)}</a></td><td>${esc(r.brand)}</td><td class="num">$${r.price.toFixed(2)}</td><td>${r.sold_out.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</td><td class="num">${r.in_stock}</td></tr>`).join("")
+    : '<tr><td colspan="5" class="state">Nothing is partly sold out right now.</td></tr>';
+}
+
+function sample() {
+  if (!window.Chart) return;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+  const online = [8200, 7600, 9100, 10400, 12800, 11300, 10100, 11900, 13400];
+  const stores = [21500, 19800, 23900, 26100, 31200, 28700, 27300, 30400, 33800];
+  new Chart(document.getElementById("s-sales"), {
+    type: "line",
+    data: { labels: months, datasets: [
+      { label: "In stores", data: stores, borderColor: C.pink, backgroundColor: C.pink, borderWidth: 2, tension: .3, pointRadius: 3 },
+      { label: "Online", data: online, borderColor: C.gold, backgroundColor: C.gold, borderWidth: 2, tension: .3, pointRadius: 3 } ] },
+    options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "top", align: "start" }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${money(c.raw)} (sample)` } } }, scales: { x: noGrid, y: axis({ beginAtZero: true, ticks: { color: C.muted, callback: (v) => "$" + v / 1000 + "k" } }) } },
+  });
+  new Chart(document.getElementById("s-cust"), {
+    type: "bar",
+    data: { labels: months, datasets: [
+      { label: "Returning", data: [310, 290, 340, 380, 450, 420, 400, 440, 500], backgroundColor: C.pink, borderRadius: 4, borderSkipped: "start", maxBarThickness: 26 },
+      { label: "New", data: [140, 120, 170, 200, 260, 210, 190, 230, 270], backgroundColor: C.gold, borderRadius: 4, borderSkipped: "start", maxBarThickness: 26 } ] },
+    options: { maintainAspectRatio: false, plugins: { legend: { position: "top", align: "start" }, tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.raw} customers (sample)` } } },
+      datasets: { bar: { borderColor: "#fff", borderWidth: { top: 2 } } }, scales: { x: { ...noGrid, stacked: true }, y: axis({ stacked: true, beginAtZero: true }) } },
+  });
+  bar("s-loc", ["Store 1", "Store 2", "Store 3", "Store 4", "Online"], [24, 21, 18, 15, 22], { horizontal: true, fmt: (v) => v + "% of sales (sample)", tick: (v) => v + "%" });
+  bar("s-cat", ["Girl", "Baby", "Play & Jellycat", "Gifts for Her", "Boy", "Holiday"], [14200, 12600, 9800, 7400, 5100, 4300], { horizontal: true, fmt: (v) => money(v) + " (sample)", tick: (v) => "$" + v / 1000 + "k" });
+}
+
+live();
+sample();
+</script>
+</body>
+</html>
