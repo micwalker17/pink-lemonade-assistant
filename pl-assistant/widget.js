@@ -12,7 +12,6 @@
   root.id = "pla-root";
   root.innerHTML = `
     <div id="pla-banner" ${state.banner ? "" : "hidden"}>Staff preview of pinklemonademi.com with the new shop assistant. Buying is turned off.<button type="button" aria-label="Hide notice">×</button></div>
-    <a id="pla-insights" href="/analytics"><span aria-hidden="true">📊</span>Shop Insights</a>
     <button id="pla-fab" type="button" aria-expanded="false" aria-controls="pla-panel"><i></i>Ask Pink Lemonade</button>
     <section id="pla-panel" hidden aria-label="Shop assistant">
       <div class="pla-head"><div><strong>Pink Lemonade Assistant</strong><small>Stock, sizes, gifts, shipping and returns</small></div><button type="button" class="pla-x" aria-label="Close chat">×</button></div>
@@ -101,6 +100,31 @@
     const el = e.target.closest && e.target.closest('[name="add"], [name="checkout"], .shopify-payment-button, a[href^="/cart"], a[href*="checkout"]');
     if (el && !root.contains(el)) { e.preventDefault(); e.stopImmediatePropagation(); toast("This is a staff preview, so buying is turned off. Try the chat instead!"); }
   }, true);
+
+  // Shop Insights link in the store header, top right, borrowing the theme's own lettering.
+  function addInsightsLink() {
+    if (document.getElementById("pla-insights")) return;
+    const font = document.createElement("link");
+    font.rel = "stylesheet"; font.href = "https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap";
+    document.head.appendChild(font);
+    const a = document.createElement("a");
+    a.id = "pla-insights"; a.href = "/analytics"; a.textContent = "Shop Insights";
+    const header = document.querySelector("header, .header, [class*='header-wrapper'], #shopify-section-header");
+    const account = header && header.querySelector('a[href*="/account"], a[href*="/cart"], [class*="header__icons"] a');
+    if (account) {
+      account.parentNode.insertBefore(a, account);
+      a.classList.add("pla-in-header");
+      const els = [...header.querySelectorAll("a, span, h1, h2, p, div")].slice(0, 400);
+      const script = els.find((el) => /script|cursive|brush|hand|signature|dancing|allura|pacifico|parisienne|vibes/i.test(getComputedStyle(el).fontFamily));
+      const nav = header.querySelector("nav a, [class*='menu'] a, [class*='nav'] a");
+      if (script) a.style.fontFamily = getComputedStyle(script).fontFamily;
+      if (nav) a.style.color = getComputedStyle(nav).color;
+    } else {
+      a.classList.add("pla-floating");
+      document.body.appendChild(a);
+    }
+  }
+  addInsightsLink();
 
   render();
   setOpen(state.open);

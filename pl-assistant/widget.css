@@ -28,8 +28,9 @@
 #pla-root, #pla-root *, #pla-root input, #pla-root input::placeholder, #pla-root button, #pla-toast{text-transform:none !important;letter-spacing:normal !important;font-variant:normal !important}
 #pla-root input, #pla-root button{font-family:system-ui,-apple-system,"Segoe UI",sans-serif !important}
 #pla-root .pla-head strong{font-family:Georgia,serif !important}
-#pla-insights{position:fixed;left:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:2147483001;display:flex;align-items:center;gap:8px;background:#fff;color:var(--pla-pink) !important;border:2px solid var(--pla-pink);border-radius:999px;padding:11px 18px;font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif !important;text-decoration:none !important;box-shadow:0 10px 30px rgba(178,50,95,.2)}
-#pla-insights:hover{background:var(--pla-blush)}
-@media (max-width:520px){#pla-insights{padding:10px 14px;font-size:14px !important}}
-#pla-root #pla-q::placeholder{text-transform:none !important;letter-spacing:normal !important;font-variant:normal !important}
-#pla-root #pla-q::-webkit-input-placeholder{text-transform:none !important;letter-spacing:normal !important}
+/* Shop Insights link: sits in the store header (top right), in a cursive face */
+#pla-insights{font-family:"Dancing Script","Brush Script MT","Segoe Script",cursive;font-size:22px;font-weight:600;line-height:1;color:#b2325f;text-decoration:none !important;text-transform:none !important;letter-spacing:normal !important;white-space:nowrap;align-self:center}
+#pla-insights:hover{text-decoration:underline !important}
+#pla-insights.pla-in-header{margin:0 14px;display:inline-flex;align-items:center}
+#pla-insights.pla-floating{position:fixed;top:40px;right:18px;z-index:2147482999;background:#fff;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(178,50,95,.2)}
+@media (max-width:520px){#pla-insights{font-size:18px}#pla-insights.pla-in-header{margin:0 6px}}
