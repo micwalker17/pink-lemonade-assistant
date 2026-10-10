@@ -24,6 +24,8 @@
   const $ = (s) => root.querySelector(s);
   const panel = $("#pla-panel"), fab = $("#pla-fab"), msgs = $(".pla-msgs"), input = $("#pla-q");
   let busy = false;
+  // The store theme sets its inputs in an all-caps style; inline !important beats any theme rule.
+  for (const [k, val] of [["text-transform", "none"], ["letter-spacing", "normal"], ["font-variant", "normal"], ["font-family", 'system-ui,-apple-system,"Segoe UI",sans-serif']]) input.style.setProperty(k, val, "important");
 
   // Show [label](/path) links from the assistant as real links; everything else stays plain text.
   function fill(el, text) {

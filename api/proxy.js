@@ -12,8 +12,9 @@ function rewriteHtml(html) {
   const own = new RegExp(`(href=["'])(?:https?:)?//(?:www\\.)?${esc}(?=[/"'?#])`, "gi");
   html = html.replace(/<a\b[^>]*>/gi, (tag) => tag.replace(own, "$1").replace(/(href=["'])(?=["'])/i, "$1/"));
   html = html.replace(/(<form[^>]*action=["'])(?:https?:)?\/\/(?:www\.)?[^"']*?(\/cart)/gi, "$1$2");
-  const head = `<meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/pl-assistant/widget.css">`;
-  const tail = `<script src="/pl-assistant/widget.js" defer></script>`;
+  const v = (process.env.VERCEL_GIT_COMMIT_SHA || "dev").slice(0, 7); // new version on every deploy, so browsers drop old copies
+  const head = `<meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/pl-assistant/widget.css?v=${v}">`;
+  const tail = `<script src="/pl-assistant/widget.js?v=${v}" defer></script>`;
   html = /<\/head>/i.test(html) ? html.replace(/<\/head>/i, head + "</head>") : head + html;
   html = /<\/body>/i.test(html) ? html.replace(/<\/body>(?![\s\S]*<\/body>)/i, tail + "</body>") : html + tail;
   return html;
