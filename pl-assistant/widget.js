@@ -11,7 +11,8 @@
   const root = document.createElement("div");
   root.id = "pla-root";
   root.innerHTML = `
-    <div id="pla-banner" ${state.banner ? "" : "hidden"}>Staff preview of pinklemonademi.com with the new shop assistant. Buying is turned off. <a href="/analytics" style="color:#3b2530;font-weight:700">See shop insights →</a><button type="button" aria-label="Hide notice">×</button></div>
+    <div id="pla-banner" ${state.banner ? "" : "hidden"}>Staff preview of pinklemonademi.com with the new shop assistant. Buying is turned off.<button type="button" aria-label="Hide notice">×</button></div>
+    <a id="pla-insights" href="/analytics"><span aria-hidden="true">📊</span>Shop Insights</a>
     <button id="pla-fab" type="button" aria-expanded="false" aria-controls="pla-panel"><i></i>Ask Pink Lemonade</button>
     <section id="pla-panel" hidden aria-label="Shop assistant">
       <div class="pla-head"><div><strong>Pink Lemonade Assistant</strong><small>Stock, sizes, gifts, shipping and returns</small></div><button type="button" class="pla-x" aria-label="Close chat">×</button></div>
