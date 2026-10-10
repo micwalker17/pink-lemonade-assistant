@@ -4,7 +4,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 const ORIGIN = process.env.STORE_ORIGIN || "https://pinklemonademi.com";
-const client = new Anthropic(); // reads ANTHROPIC_API_KEY from the host's environment settings
+const keyName = Object.keys(process.env).find((k) => k.trim().toUpperCase() === "ANTHROPIC_API_KEY");
+const client = new Anthropic({ apiKey: keyName ? process.env[keyName].trim() : undefined }); // key from the host's environment settings
 
 const SYSTEM = `You are the friendly shop assistant on the Pink Lemonade boutique website (${ORIGIN}).
 Pink Lemonade is a family-owned boutique with 4 brick-and-mortar locations in Michigan (Grand Rapids area), selling cute things for children, home and her. Free shipping on online orders over $100. Instagram and Facebook: @pinklemonadegr.
@@ -169,7 +170,9 @@ export async function answer(history, pagePath) {
 
 // Open /api/chat?check=1 in a browser to see whether the key and the store connection work.
 async function healthCheck(res) {
-  const report = { key_present: Boolean(process.env.ANTHROPIC_API_KEY), key_starts_with: (process.env.ANTHROPIC_API_KEY || "").slice(0, 7) };
+  const report = { key_present: Boolean(keyName), key_starts_with: keyName ? process.env[keyName].trim().slice(0, 7) : "",
+    similar_variable_names: Object.keys(process.env).filter((k) => /anthropic|api.?key|claude/i.test(k)),
+    vercel_env: process.env.VERCEL_ENV, deployed_commit: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7) };
   try {
     const r = await client.messages.create({ model: "claude-opus-5-5", max_tokens: 200, output_config: { effort: "low" }, messages: [{ role: "user", content: "Say OK." }] });
     report.claude = "ok: " + r.content.filter((b) => b.type === "text").map((b) => b.text).join("").slice(0, 40);
