@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pink Lemonade Shop Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<style>
+/* Layout: a boutique storefront (announcement bar, logo, nav, product grid) with a floating shop-assistant chat in the corner */
+:root{
+  --bg:#fffafb; --surface:#ffffff; --blush:#fbe3ea; --pink:#e8668f; --pink-ink:#b2325f;
+  --lemon:#f6dc6b; --ink:#3b2530; --muted:#86707a; --line:#f0d6de; --ok:#2f7d55; --out:#b0a3a8;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --shadow:0 10px 30px rgba(178,50,95,.16);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1f1519; --surface:#2a1d22; --blush:#3a2530; --pink:#f08aab; --pink-ink:#f6a9c1;
+  --lemon:#e9cf5c; --ink:#f7e9ee; --muted:#bfa6b0; --line:#463039; --ok:#7fd1a4; --out:#7d6b72;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1f1519; --surface:#2a1d22; --blush:#3a2530; --pink:#f08aab; --pink-ink:#f6a9c1;
+  --lemon:#e9cf5c; --ink:#f7e9ee; --muted:#bfa6b0; --line:#463039; --ok:#7fd1a4; --out:#7d6b72;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+a{color:inherit}
+.announce{background:var(--pink);color:#fff;text-align:center;font-weight:700;font-size:13px;letter-spacing:.04em;padding:8px 16px}
+.demo-flag{background:var(--lemon);color:#3b2530;text-align:center;font-size:13px;padding:6px 16px}
+header{border-bottom:1px solid var(--line);background:var(--surface)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px}
+.brandrow{display:flex;flex-direction:column;align-items:center;gap:2px;padding-block:22px 10px}
+.logo{font-family:var(--display);font-size:clamp(34px,6vw,52px);color:var(--pink-ink);line-height:1;margin:0;font-weight:400}
+.logo span{display:inline-block;width:.42em;height:.42em;border-radius:50%;background:var(--lemon);margin-left:.12em;vertical-align:.45em}
+.tag{color:var(--muted);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+nav{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 22px;padding-block:10px 14px;font-size:14px;font-weight:600}
+nav a{text-decoration:none;padding:2px 0;border-bottom:2px solid transparent}
+nav a:hover{border-color:var(--pink)}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:center;padding-block:28px}
+.hero h2{font-family:var(--display);font-weight:400;font-size:clamp(26px,4vw,38px);line-height:1.15;margin:0 0 10px;text-wrap:balance}
+.hero p{margin:0 0 16px;color:var(--muted);max-width:52ch}
+.hero-card{background:var(--blush);border-radius:18px;padding:18px 20px}
+.hero-card b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink-ink);margin-bottom:8px}
+.hero-card button{display:block;width:100%;text-align:left;margin-top:8px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font:inherit;font-size:14px;cursor:pointer}
+.hero-card button:hover{border-color:var(--pink)}
+.btn{background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer}
+.dark-text{color:var(--bg)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding-block:6px 14px}
+.toolbar h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--pink-ink);border-color:var(--pink-ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px 16px;padding-bottom:60px}
+.card{display:flex;flex-direction:column;gap:6px;min-width:0}
+.swatch{aspect-ratio:4/5;max-width:100%;border-radius:14px;position:relative;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+.swatch .mono{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:56px;color:rgba(255,255,255,.75)}
+.swatch .badge{position:relative;background:rgba(255,255,255,.92);color:#3b2530;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:3px 7px}
+.vendor{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pname{font-weight:600;line-height:1.3}
+.price{font-variant-numeric:tabular-nums;font-weight:700;color:var(--pink-ink)}
+.sizes{display:flex;flex-wrap:wrap;gap:4px}
+.sz{font-size:11px;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-variant-numeric:tabular-nums}
+.sz.out{color:var(--out);text-decoration:line-through}
+footer{border-top:1px solid var(--line);background:var(--surface);padding-block:28px;font-size:13px;color:var(--muted)}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+footer b{color:var(--ink);display:block;margin-bottom:4px}
+
+/* chat */
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:8px;background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:inherit;font-weight:700;box-shadow:var(--shadow);cursor:pointer}
+.fab i{width:10px;height:10px;border-radius:50%;background:var(--lemon);display:inline-block}
+.panel{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:21;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 120px));background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.phead{background:var(--pink-ink);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.phead strong{font-family:var(--display);font-weight:400;font-size:19px;display:block}
+.phead small{opacity:.85;font-size:12px}
+.phead button{background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.m{max-width:88%;padding:9px 13px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.m.bot{background:var(--blush);align-self:flex-start;border-bottom-left-radius:4px}
+.m.me{background:var(--pink-ink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.m.note{align-self:center;background:transparent;color:var(--muted);font-size:12px;text-align:center;padding:2px}
+.sugg{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.sugg button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;cursor:pointer}
+form.ask{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+form.ask input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:10px 14px;font:inherit;background:var(--bg);color:var(--ink)}
+form.ask button{background:var(--pink-ink);color:#fff;border:0;border-radius:999px;padding:0 16px;font:inherit;font-weight:700;cursor:pointer}
+.mode{font-size:11px;color:var(--muted);text-align:center;padding:0 10px 8px}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
+@media (max-width:720px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.swatch .mono{font-size:40px}}
+@media (prefers-reduced-motion:no-preference){.panel{animation:pop .18s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:.6}}}
+</style>
+</head>
+<body>
+
+<div class="announce">Free shipping on orders over $100</div>
+<div class="demo-flag"><b>Staff preview.</b> This is a test copy of pinklemonademi.com with the new shop assistant added. Nothing here can be purchased.</div>
+<header>
+  <div class="wrap">
+    <div class="brandrow">
+      <h1 class="logo">Pink Lemonade<span></span></h1>
+      <div class="tag">Children · Home · Her</div>
+    </div>
+    <nav aria-label="Shop">
+      <a href="#shop" data-cat="New">New Arrivals</a>
+      <a href="#shop" data-cat="Baby">Baby</a>
+      <a href="#shop" data-cat="Girl">Girl</a>
+      <a href="#shop" data-cat="Boy">Boy</a>
+      <a href="#shop" data-cat="Play">Play</a>
+      <a href="#shop" data-cat="Holiday">Holiday</a>
+      <a href="#shop" data-cat="Her">Gift Shop</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h2>Ask us anything, any time.</h2>
+      <p>Our new shop assistant knows what's on the shelves right now: which sizes are left, what's new from Rylee + Cru and Jellycat, and how shipping works. Try it with the pink button in the corner.</p>
+      <button class="btn" id="openHero" type="button">Chat with Pink Lemonade</button>
+    </div>
+    <div class="hero-card">
+      <b>Customers ask things like</b>
+      <button type="button" data-q="Do you have the Fran Dress Holiday Plaid in 4-5Y?">Do you have the Fran Dress Holiday Plaid in 4-5Y?</button>
+      <button type="button" data-q="What Jellycat do you have under $30?">What Jellycat do you have under $30?</button>
+      <button type="button" data-q="I need a baby shower gift around $40. Ideas?">I need a baby shower gift around $40. Ideas?</button>
+      <button type="button" data-q="Is the Periwinkle sequin dress available in 7/8Y?">Is the Periwinkle sequin dress available in 7/8Y?</button>
+    </div>
+  </section>
+
+  <section id="shop">
+    <div class="toolbar">
+      <h3 id="shopTitle">Shop all</h3>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div><b>Pink Lemonade</b>A family-owned boutique with four brick-and-mortar locations in Michigan. Cute things for children, home and her.</div>
+    <div><b>Follow along</b>Instagram and Facebook: @pinklemonadegr</div>
+    <div><b>About this preview</b>Products, prices and sizes copied from the live shop on October 10, 2026. Photos are left out of this copy; color tiles stand in for them.</div>
+  </div>
+</footer>
+
+<button class="fab" id="fab" type="button" aria-expanded="false" aria-controls="panel"><i></i>Ask Pink Lemonade</button>
+<section class="panel" id="panel" hidden aria-label="Shop assistant">
+  <div class="phead">
+    <div><strong>Pink Lemonade Assistant</strong><small>Stock, sizes, gifts and shipping</small></div>
+    <button type="button" id="close" aria-label="Close chat">×</button>
+  </div>
+  <div class="msgs" id="msgs" aria-live="polite"></div>
+  <div class="sugg" id="sugg"></div>
+  <form class="ask" id="ask">
+    <input id="q" autocomplete="off" placeholder="Ask about a product, size or gift…" aria-label="Your question">
+    <button type="submit">Send</button>
+  </form>
+  <div class="mode" id="mode">Connecting to the assistant…</div>
+</section>
+
+<script type="module">
+import { PRODUCTS as P } from "./catalog.js";
+
+
+
+
+// ---------- storefront ----------
+const CATS=[["All","Shop all"],["New","New Arrivals"],["Baby","Baby"],["Girl","Girl"],["Boy","Boy"],["Play","Play & Jellycat"],["Holiday","Holiday"],["Her","Gifts for Her"]];
+let cur="All";
+const grid=document.getElementById("grid"), chips=document.getElementById("chips");
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderChips(){chips.innerHTML=CATS.map(([k,l])=>`<button class="chip" type="button" data-k="${k}" aria-pressed="${k===cur}">${l}</button>`).join("")}
+function renderGrid(){
+  const list=P.filter(p=>cur==="All"||p.cats.includes(cur));
+  document.getElementById("shopTitle").textContent=(CATS.find(c=>c[0]===cur)||[])[1]+` (${list.length})`;
+  grid.innerHTML=list.map(p=>{
+    const sizes=p.inStock[0]==="One size"?"":`<div class="sizes">${p.inStock.map(s=>`<span class="sz">${esc(s)}</span>`).join("")}${p.soldOut.map(s=>`<span class="sz out" title="Sold out">${esc(s)}</span>`).join("")}</div>`;
+    const badge=p.soldOut.length?'<span class="badge">Some sizes sold out</span>':(p.cats.includes("New")?'<span class="badge">New</span>':"");
+    return `<article class="card"><div class="swatch" style="background:linear-gradient(160deg,${p.color},${p.color}cc)"><span class="mono">${esc(p.brand[0])}</span>${badge}</div>
+      <div class="vendor">${esc(p.brand)}</div><div class="pname">${esc(p.title)}</div><div class="price">$${p.price.toFixed(2)}</div>${sizes}</article>`}).join("");
+}
+chips.addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;cur=b.dataset.k;renderChips();renderGrid()});
+document.querySelectorAll("nav a").forEach(a=>a.addEventListener("click",()=>{cur=a.dataset.cat;renderChips();renderGrid()}));
+renderChips();renderGrid();
+
+// ---------- chat ----------
+const panel=document.getElementById("panel"), fab=document.getElementById("fab"), msgs=document.getElementById("msgs"), modeEl=document.getElementById("mode"), qEl=document.getElementById("q");
+const SUGG=["What's new from Rylee + Cru?","Jellycat under $30?","Baby gift around $40","Do you ship free?"];
+let turns=[], busy=false, aiReady=true;
+function add(cls,text){const d=document.createElement("div");d.className="m "+cls;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
+function openChat(){panel.hidden=false;fab.setAttribute("aria-expanded","true");if(!msgs.children.length){add("bot","Hi! I'm the Pink Lemonade assistant. Ask me what's in stock, which sizes are left, or for gift ideas.");}qEl.focus()}
+function closeChat(){panel.hidden=true;fab.setAttribute("aria-expanded","false")}
+fab.onclick=()=>panel.hidden?openChat():closeChat();
+document.getElementById("close").onclick=closeChat;
+document.getElementById("openHero").onclick=openChat;
+document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{openChat();ask(b.dataset.q)});
+document.getElementById("sugg").innerHTML=SUGG.map(s=>`<button type="button">${esc(s)}</button>`).join("");
+document.getElementById("sugg").addEventListener("click",e=>{if(e.target.tagName==="BUTTON")ask(e.target.textContent)});
+document.getElementById("ask").addEventListener("submit",e=>{e.preventDefault();const v=qEl.value.trim();if(v){qEl.value="";ask(v)}});
+
+function setMode(ai){aiReady=ai;modeEl.textContent=ai?"Answers by Claude from the shop's current catalog":"Simple search mode: the AI is unavailable right now"}
+setMode(true);
+
+async function ask(text){
+  if(busy)return; busy=true;
+  add("me",text);
+  if(aiReady){
+    const bubble=add("bot","Thinking…");
+    turns.push({role:"user",content:text});
+    try{
+      const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:turns.slice(-10)})});
+      const data=await r.json().catch(()=>({}));
+      if(!r.ok) throw Object.assign(new Error(data.error||"failed"),{status:r.status});
+      bubble.textContent=data.reply; turns.push({role:"assistant",content:data.reply});
+    }catch(e){
+      turns.pop();
+      if(e.status===429) bubble.textContent="I'm getting a lot of questions at once. Please try again in a minute.";
+      else {setMode(false); bubble.textContent=localAnswer(text);}
+    }
+  } else { add("bot",localAnswer(text)); }
+  busy=false;
+}
+
+// Keyword fallback so the demo still answers without AI access.
+const STOP=new Set("a an the do you have any is are what whats what's in for of to i me my need it some show find and or with your got there size sizes available stock left please can under around about ideas idea gift gifts".split(" "));
+function localAnswer(q){
+  const s=q.toLowerCase();
+  if(/ship/.test(s)) return "Shipping is free on orders over $100. For anything under that, rates show at checkout.";
+  if(/hour|open|close|address|locat|where.*store|phone|call/.test(s)) return "We have four shops in Michigan. A team member can confirm hours and addresses for you. You can also message us on Instagram at @pinklemonadegr.";
+  if(/return|exchange|refund/.test(s)) return "A team member can walk you through returns and exchanges. Message us on Instagram at @pinklemonadegr and we'll help.";
+  const max=(s.match(/(?:under|below|less than)\s*\$?(\d+)/)||[])[1];
+  const near=(s.match(/(?:around|about)\s*\$?(\d+)/)||[])[1];
+  const sizeM=q.match(/\b(\d{1,2}\s*-\s*\d{1,2}\s*[MY]|\d\/\d\s*Y|\dT|NB)\b/i);
+  const size=sizeM?sizeM[1].replace(/\s/g,"").toUpperCase():null;
+  const words=s.replace(/[^a-z0-9+&\s]/g," ").split(/\s+/).filter(w=>w.length>1&&!STOP.has(w)&&!/^\d/.test(w));
+  let list=P.map(p=>{const hay=(p.title+" "+p.brand+" "+p.cats.join(" ")).toLowerCase();let sc=0;words.forEach(w=>{if(hay.includes(w))sc+=w.length>3?2:1});if(/baby|shower/.test(s)&&p.cats.includes("Baby"))sc+=1;if(/her|mom|mama|wife/.test(s)&&p.cats.includes("Her"))sc+=1;return{p,sc}});
+  if(max) list=list.filter(x=>x.p.price<=+max);
+  if(near) list=list.filter(x=>Math.abs(x.p.price-near)<=12);
+  const anyWords=words.length>0;
+  list=list.filter(x=>!anyWords||x.sc>0).sort((a,b)=>b.sc-a.sc||a.p.price-b.p.price).slice(0,4);
+  if(!list.length) return "I don't see that online right now. Our stores carry more than the website, so a team member can check for you.";
+  return list.map(({p})=>{
+    let line=`• ${p.title} (${p.brand}), $${p.price.toFixed(2)}`;
+    if(size){const up=x=>x.replace(/\s/g,"").toUpperCase();if(p.soldOut.some(x=>up(x)===size))line+=` — ${size} is sold out. Still in: ${p.inStock.join(", ")}`;else if(p.inStock.some(x=>up(x)===size))line+=` — ${size} is in stock`;else if(p.inStock[0]!=="One size")line+=` — sizes: ${p.inStock.join(", ")}`;}
+    else if(p.inStock[0]!=="One size")line+=` — in stock: ${p.inStock.join(", ")}${p.soldOut.length?`; sold out: ${p.soldOut.join(", ")}`:""}`;
+    return line}).join("\n");
+}
+</script>
+</body>
+</html>
