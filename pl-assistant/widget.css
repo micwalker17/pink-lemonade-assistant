@@ -1,0 +1,26 @@
+/* Pink Lemonade shop-assistant bubble, added on top of every page of the store copy */
+#pla-root{--pla-pink:#b2325f;--pla-blush:#fbe3ea;--pla-lemon:#f6dc6b;--pla-ink:#3b2530;--pla-line:#f0d6de;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;line-height:1.45;color:var(--pla-ink)}
+#pla-root *{box-sizing:border-box}
+#pla-banner{position:fixed;left:0;right:0;top:0;z-index:2147483000;background:var(--pla-lemon);color:#3b2530;text-align:center;font:600 12px/1.2 system-ui,sans-serif;padding:6px 40px 6px 12px}
+#pla-banner button{position:absolute;right:8px;top:2px;border:0;background:none;font-size:18px;cursor:pointer;color:#3b2530}
+#pla-fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:2147483001;display:flex;align-items:center;gap:8px;background:var(--pla-pink);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:700 15px system-ui,sans-serif;box-shadow:0 10px 30px rgba(178,50,95,.3);cursor:pointer}
+#pla-fab i{width:10px;height:10px;border-radius:50%;background:var(--pla-lemon);display:inline-block}
+#pla-panel{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:2147483002;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 120px));background:#fff;border:1px solid var(--pla-line);border-radius:20px;box-shadow:0 10px 30px rgba(178,50,95,.25);display:flex;flex-direction:column;overflow:hidden}
+#pla-panel[hidden]{display:none}
+.pla-head{background:var(--pla-pink);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pla-head strong{font-family:Georgia,serif;font-weight:400;font-size:19px;display:block}
+.pla-head small{opacity:.85;font-size:12px}
+.pla-head button{background:none;border:0;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.pla-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:0}
+.pla-m{max-width:88%;padding:9px 13px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.pla-m a{color:var(--pla-pink);font-weight:600}
+.pla-bot{background:var(--pla-blush);align-self:flex-start;border-bottom-left-radius:4px}
+.pla-me{background:var(--pla-pink);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.pla-sugg{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 8px}
+.pla-sugg button{border:1px solid var(--pla-line);background:#fffafb;color:var(--pla-ink);border-radius:999px;padding:5px 10px;font:12px system-ui,sans-serif;cursor:pointer}
+.pla-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--pla-line);margin:0}
+.pla-form input{flex:1;min-width:0;border:1px solid var(--pla-line);border-radius:999px;padding:10px 14px;font:15px system-ui,sans-serif;color:var(--pla-ink);background:#fffafb}
+.pla-form button{background:var(--pla-pink);color:#fff;border:0;border-radius:999px;padding:0 16px;font:700 14px system-ui,sans-serif;cursor:pointer}
+#pla-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:2147483003;background:var(--pla-ink);color:#fff;padding:10px 16px;border-radius:12px;font:14px system-ui,sans-serif;max-width:calc(100vw - 32px)}
+#pla-root button:focus-visible,#pla-root input:focus-visible{outline:3px solid var(--pla-lemon);outline-offset:2px}

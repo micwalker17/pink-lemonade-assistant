@@ -1,30 +1,26 @@
-# Pink Lemonade shop assistant (staff demo)
+# Pink Lemonade shop assistant (staff preview)
 
-A copy of the Pink Lemonade storefront with an AI chat assistant beside it. Anyone with the link can use it; no sign-in.
+A live copy of pinklemonademi.com with an AI shop assistant added to every page. Anyone with the link can use it; no sign-in.
 
-## Put it online with Streamlit Community Cloud
+## How it works
 
-1. Go to share.streamlit.io and click **Create app**, then **Deploy a public app from GitHub**.
-2. Repository: `micwalker17/pink-lemonade-assistant`, branch `main`, main file `streamlit_app.py`.
-3. Open **Advanced settings** and paste this into **Secrets**, with your key:
+- **Every page is her real page.** When someone opens a page on the preview, `api/proxy.js` fetches the same page from pinklemonademi.com, keeps the links inside the preview, and adds the chat bubble. Nothing is copied by hand, so the design, menus, photos, prices and stock always match the live site.
+- **Buying is turned off.** Cart, checkout and account pages show a "staff preview" notice instead.
+- **The assistant reads the live store.** `api/chat.js` gives Claude four lookups: search all products, get one product's sizes and stock, read any page (policies, contact, about), and list the site's pages. It also knows which page the shopper is on, so "is this in 4T?" works on a product page.
+- **Search engines are told to skip the preview**, so it can't compete with her real site in Google.
+- The API key stays on the server and is never sent to visitors.
 
-   ```toml
-   ANTHROPIC_API_KEY = "sk-ant-..."
-   ```
+## Put it online (Vercel, free plan)
 
-4. Click **Deploy** and share the `….streamlit.app` link.
-
-Secrets belong to each app, so the key needs to be pasted here even if another Streamlit app already has it. The key stays on Streamlit's server and is never sent to visitors.
-
-## Files
-
-- `streamlit_app.py`: the Streamlit app (storefront on the left, chat on the right).
-- `storefront.html`: the storefront copy shown in the app.
-- `system_prompt.txt`: what the assistant knows (store facts and the catalog snapshot).
-- `catalog.js`: the catalog source. After editing it, regenerate the prompt with
-  `node -e "import('./catalog.js').then(m=>require('fs').writeFileSync('system_prompt.txt', m.buildRules()))"`.
-- `index.html`, `api/chat.js`, `package.json`: an alternative version for Vercel, if you ever want the chat bubble inside the storefront itself.
+1. Get an API key at console.anthropic.com and set a monthly spend limit under Limits.
+2. At vercel.com/new, sign in with GitHub and import `micwalker17/pink-lemonade-assistant`. Leave the build settings alone.
+3. Before deploying, add an environment variable `ANTHROPIC_API_KEY` with the key.
+4. Deploy and share the `https://<project>.vercel.app` link.
 
 ## Cost
 
-The assistant uses Claude Opus 5.5 at low effort, roughly 1 to 2 cents per question, and each visitor is capped at 30 questions per session. Set a monthly spend limit in the Anthropic Console. Changing `model` in `streamlit_app.py` to `claude-haiku-5-5` makes it far cheaper, with somewhat simpler answers.
+Claude Opus 5.5 at low effort. A question usually costs a few cents, a bit more when it needs several lookups. Each visitor is limited to 8 questions a minute. Changing `model` in `api/chat.js` to `claude-haiku-5-5` makes it far cheaper, with somewhat simpler answers.
+
+## Other files
+
+`streamlit_app.py`, `storefront.html`, `system_prompt.txt`, `catalog.js` and `requirements.txt` are the earlier Streamlit version (a snapshot of about 95 products beside a chat panel). Vercel ignores them.
