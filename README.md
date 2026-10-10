@@ -23,4 +23,4 @@ Claude Opus 5.5 at low effort. A question usually costs a few cents, a bit more 
 
 ## Other files
 
-`streamlit_app.py`, `storefront.html`, `system_prompt.txt`, `catalog.js` and `requirements.txt` are the earlier Streamlit version (a snapshot of about 95 products beside a chat panel). Vercel ignores them.
+The `streamlit-version` folder holds the earlier Streamlit version (a snapshot of about 95 products beside a chat panel). Vercel ignores it.

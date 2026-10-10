@@ -1,11 +1,28 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
   "redirects": [
-    { "source": "/cdn/:path*", "destination": "https://pinklemonademi.com/cdn/:path*", "permanent": false }
+    {
+      "source": "/cdn/:path*",
+      "destination": "https://pinklemonademi.com/cdn/:path*",
+      "permanent": false
+    }
   ],
   "rewrites": [
-    { "source": "/:path((?!api/|pl-assistant/).*)", "destination": "/api/proxy?path=/:path" }
+    {
+      "source": "/:path((?!api/|pl-assistant/).*)",
+      "destination": "/api/proxy?path=/:path"
+    }
   ],
   "headers": [
-    { "source": "/(.*)", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
   ]
 }
