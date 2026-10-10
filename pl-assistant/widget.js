@@ -116,20 +116,26 @@
     document.head.appendChild(font);
     const a = document.createElement("a");
     a.id = "pla-insights"; a.href = "/analytics"; a.textContent = "Shop Insights";
-    const header = document.querySelector("header, .header, [class*='header-wrapper'], #shopify-section-header");
-    const account = header && header.querySelector('a[href*="/account"], a[href*="/cart"], [class*="header__icons"] a');
-    if (account) {
-      account.parentNode.insertBefore(a, account);
-      a.classList.add("pla-in-header");
-      const els = [...header.querySelectorAll("a, span, h1, h2, p, div")].slice(0, 400);
-      const script = els.find((el) => /script|cursive|brush|hand|signature|dancing|allura|pacifico|parisienne|vibes/i.test(getComputedStyle(el).fontFamily));
-      const nav = header.querySelector("nav a, [class*='menu'] a, [class*='nav'] a");
-      if (script) a.style.fontFamily = getComputedStyle(script).fontFamily;
+    // Sit just left of the visible search/account/cart icons in the top-right of the header.
+    const seen = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.top < 220 && r.right > innerWidth * 0.55 && getComputedStyle(el).visibility !== "hidden"; };
+    const icons = [...document.querySelectorAll('a[href*="/search"], a[href*="/account"], a[href*="/cart"], button[aria-controls*="search" i], details-modal summary')].filter(seen)
+      .sort((x, y) => x.getBoundingClientRect().left - y.getBoundingClientRect().left);
+    const anchor = icons[0];
+    if (anchor && !root.contains(anchor)) {
+      anchor.parentNode.insertBefore(a, anchor);
+      a.className = "pla-in-header";
+      const nav = [...document.querySelectorAll("header nav a, nav a")].find(seen) || document.querySelector("header nav a");
       if (nav) a.style.color = getComputedStyle(nav).color;
-    } else {
-      a.classList.add("pla-floating");
-      document.body.appendChild(a);
     }
+    // If it didn't land somewhere a person can actually see and tap, float it in the top-right corner instead.
+    requestAnimationFrame(() => {
+      const r = a.getBoundingClientRect();
+      const top = a.isConnected && r.width > 0 && document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!top || (top !== a && !a.contains(top))) {
+        a.className = "pla-floating"; a.style.color = "";
+        root.appendChild(a);
+      }
+    });
   }
   addInsightsLink();
 

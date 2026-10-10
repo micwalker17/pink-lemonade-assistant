@@ -31,7 +31,8 @@
 #pla-insights{font-family:"Dancing Script","Brush Script MT","Segoe Script",cursive;font-size:22px;font-weight:600;line-height:1;color:#b2325f;text-decoration:none !important;text-transform:none !important;letter-spacing:normal !important;white-space:nowrap;align-self:center}
 #pla-insights:hover{text-decoration:underline !important}
 #pla-insights.pla-in-header{margin:0 14px;display:inline-flex;align-items:center}
-#pla-insights.pla-floating{position:fixed;top:40px;right:18px;z-index:2147482999;background:#fff;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(178,50,95,.2)}
+#pla-insights.pla-floating{position:fixed;top:12px;right:16px;z-index:2147483001;background:#fff;color:#b2325f;border:2px solid #f7b6c2;padding:6px 16px 8px;border-radius:999px;box-shadow:0 6px 18px rgba(178,50,95,.25)}
+#pla-banner:not([hidden]) ~ #pla-insights.pla-floating{top:44px}
 @media (max-width:520px){#pla-insights{font-size:18px}#pla-insights.pla-in-header{margin:0 6px}}
 /* Pink lemon slice: on the chat button, and spinning while the assistant thinks */
 .pla-lemon{width:22px;height:22px;flex:none;display:inline-block;vertical-align:middle}
