@@ -6,13 +6,17 @@
   const load = () => { try { return JSON.parse(sessionStorage.getItem(KEY)) || { turns: [], open: false, banner: true }; } catch { return { turns: [], open: false, banner: true }; } };
   const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
   const state = load();
+  // Pink lemon slice, like the one in the store logo; it spins while the assistant thinks.
+  const LEMON = `<svg class="pla-lemon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#f7b6c2"/><circle cx="20" cy="20" r="15" fill="#fde4ea"/>${
+    [0, 60, 120, 180, 240, 300].map((d) => `<path d="M20 20 L20 7 A13 13 0 0 1 29.96 11.64 Z" fill="#f48aa3" transform="rotate(${d + 5} 20 20) translate(20 20) scale(.92) translate(-20 -20)"/>`).join("")
+  }<circle cx="20" cy="20" r="2" fill="#fde4ea"/></svg>`;
   const SUGG = ["What's new this week?", "Jellycat under $30?", "Baby gift around $40", "What's your return policy?"];
 
   const root = document.createElement("div");
   root.id = "pla-root";
   root.innerHTML = `
     <div id="pla-banner" ${state.banner ? "" : "hidden"}>Staff preview of pinklemonademi.com with the new shop assistant. Buying is turned off.<button type="button" aria-label="Hide notice">×</button></div>
-    <button id="pla-fab" type="button" aria-expanded="false" aria-controls="pla-panel"><i></i>Ask Pink Lemonade</button>
+    <button id="pla-fab" type="button" aria-expanded="false" aria-controls="pla-panel">${LEMON}Ask Pink Lemonade</button>
     <section id="pla-panel" hidden aria-label="Shop assistant">
       <div class="pla-head"><div><strong>Pink Lemonade Assistant</strong><small>Stock, sizes, gifts, shipping and returns</small></div><button type="button" class="pla-x" aria-label="Close chat">×</button></div>
       <div class="pla-msgs" aria-live="polite"></div>
@@ -66,7 +70,8 @@
     busy = true;
     state.turns.push({ role: "user", content: q.trim() }); save();
     add("user", q.trim());
-    const bubble = add("assistant", "Looking that up…");
+    const bubble = add("assistant", "");
+    bubble.innerHTML = `<span class="pla-think">${LEMON}<span>Squeezing out an answer…</span></span>`;
     try {
       const r = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: state.turns.slice(-10), page: location.pathname }) });

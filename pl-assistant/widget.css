@@ -5,7 +5,6 @@
 #pla-banner{position:fixed;left:0;right:0;top:0;z-index:2147483000;background:var(--pla-lemon);color:#3b2530;text-align:center;font:600 12px/1.2 system-ui,sans-serif;padding:6px 40px 6px 12px}
 #pla-banner button{position:absolute;right:8px;top:2px;border:0;background:none;font-size:18px;cursor:pointer;color:#3b2530}
 #pla-fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:2147483001;display:flex;align-items:center;gap:8px;background:var(--pla-pink);color:#fff;border:0;border-radius:999px;padding:13px 18px;font:700 15px system-ui,sans-serif;box-shadow:0 10px 30px rgba(178,50,95,.3);cursor:pointer}
-#pla-fab i{width:10px;height:10px;border-radius:50%;background:var(--pla-lemon);display:inline-block}
 #pla-panel{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:2147483002;width:min(400px,calc(100vw - 32px));height:min(600px,calc(100vh - 120px));background:#fff;border:1px solid var(--pla-line);border-radius:20px;box-shadow:0 10px 30px rgba(178,50,95,.25);display:flex;flex-direction:column;overflow:hidden}
 #pla-panel[hidden]{display:none}
 .pla-head{background:var(--pla-pink);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -34,3 +33,11 @@
 #pla-insights.pla-in-header{margin:0 14px;display:inline-flex;align-items:center}
 #pla-insights.pla-floating{position:fixed;top:40px;right:18px;z-index:2147482999;background:#fff;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(178,50,95,.2)}
 @media (max-width:520px){#pla-insights{font-size:18px}#pla-insights.pla-in-header{margin:0 6px}}
+/* Pink lemon slice: on the chat button, and spinning while the assistant thinks */
+.pla-lemon{width:22px;height:22px;flex:none;display:inline-block;vertical-align:middle}
+#pla-fab .pla-lemon{width:24px;height:24px}
+.pla-think{display:inline-flex;align-items:center;gap:10px;color:#8a5a6b;font-style:italic}
+.pla-think .pla-lemon{width:28px;height:28px;animation:pla-spin 1.4s linear infinite, pla-bob 1.4s ease-in-out infinite alternate}
+@keyframes pla-spin{to{rotate:360deg}}
+@keyframes pla-bob{from{scale:.9}to{scale:1.08}}
+@media (prefers-reduced-motion:reduce){.pla-think .pla-lemon{animation:none}}
