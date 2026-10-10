@@ -140,12 +140,10 @@ export async function answer(history, pagePath) {
   if (pagePath) system.push({ type: "text", text: `The shopper is looking at this page right now: ${pagePath}` });
   const messages = [...history];
   for (let round = 0; round < 6; round++) {
-    const response = await client.beta.messages.create({
+    const response = await client.messages.create({
       model: "claude-opus-5-5",
       max_tokens: 8000,
       output_config: { effort: "low" },
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
       system,
       tools: apiTools,
       messages,
@@ -169,7 +167,25 @@ export async function answer(history, pagePath) {
   return "Sorry, I couldn't finish looking that up. Could you ask again a little more simply?";
 }
 
+// Open /api/chat?check=1 in a browser to see whether the key and the store connection work.
+async function healthCheck(res) {
+  const report = { key_present: Boolean(process.env.ANTHROPIC_API_KEY), key_starts_with: (process.env.ANTHROPIC_API_KEY || "").slice(0, 7) };
+  try {
+    const r = await client.messages.create({ model: "claude-opus-5-5", max_tokens: 200, output_config: { effort: "low" }, messages: [{ role: "user", content: "Say OK." }] });
+    report.claude = "ok: " + r.content.filter((b) => b.type === "text").map((b) => b.text).join("").slice(0, 40);
+  } catch (e) {
+    report.claude = `error ${e.status || ""} ${e.error?.error?.type || e.name}: ${e.error?.error?.message || e.message}`;
+  }
+  try {
+    report.store_products = (await allProducts()).length;
+  } catch (e) {
+    report.store_products = "error: " + e.message;
+  }
+  return res.status(200).json(report);
+}
+
 export default async function handler(req, res) {
+  if (req.method === "GET" && /check=1/.test(req.url || "")) return healthCheck(res);
   if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0] || "unknown";
   if (tooMany(ip)) return res.status(429).json({ error: "Too many questions, try again in a minute" });
@@ -189,7 +205,7 @@ export default async function handler(req, res) {
   } catch (err) {
     if (err instanceof Anthropic.RateLimitError) return res.status(429).json({ error: "Busy, try again shortly" });
     console.error(err);
-    return res.status(502).json({ error: "Assistant unavailable" });
+    return res.status(502).json({ error: "Assistant unavailable", detail: `${err.status || ""} ${err.error?.error?.type || err.name}` });
   }
 }
 
