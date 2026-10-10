@@ -10,6 +10,9 @@
   const LEMON = `<svg class="pla-lemon" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#f7b6c2"/><circle cx="20" cy="20" r="15" fill="#fde4ea"/>${
     [0, 60, 120, 180, 240, 300].map((d) => `<path d="M20 20 L20 7 A13 13 0 0 1 29.96 11.64 Z" fill="#f48aa3" transform="rotate(${d + 5} 20 20) translate(20 20) scale(.92) translate(-20 -20)"/>`).join("")
   }<circle cx="20" cy="20" r="2" fill="#fde4ea"/></svg>`;
+  const THINKING = ["Lemon-ing…", "Looking up cute things…", "Squeezing out an answer…", "Peeking at the shelves…",
+    "Checking every size…", "Fluffing the Jellycats…", "Adding a little zest…", "Sprinkling some pink…",
+    "Digging through the gift shop…", "Asking the lemons…", "Folding the tiny onesies…", "Making it extra sweet…"];
   const SUGG = ["What's new this week?", "Jellycat under $30?", "Baby gift around $40", "What's your return policy?"];
 
   const root = document.createElement("div");
@@ -71,15 +74,23 @@
     state.turns.push({ role: "user", content: q.trim() }); save();
     add("user", q.trim());
     const bubble = add("assistant", "");
-    bubble.innerHTML = `<span class="pla-think">${LEMON}<span>Squeezing out an answer…</span></span>`;
+    bubble.innerHTML = `<span class="pla-think">${LEMON}<span></span></span>`;
+    const said = bubble.querySelector(".pla-think > span");
+    const order = [...THINKING].sort(() => Math.random() - 0.5);
+    let n = 0;
+    const say = () => { said.textContent = order[n++ % order.length]; };
+    say();
+    const ticker = setInterval(say, 2200);
     try {
       const r = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: state.turns.slice(-10), page: location.pathname }) });
       const data = await r.json().catch(() => ({}));
       if (!r.ok) throw Object.assign(new Error(data.error || "failed"), { status: r.status });
+      clearInterval(ticker);
       fill(bubble, data.reply);
       state.turns.push({ role: "assistant", content: data.reply }); save();
     } catch (e) {
+      clearInterval(ticker);
       state.turns.pop(); save();
       fill(bubble, e.status === 429 ? "I'm getting a lot of questions at once. Please try again in a minute." : "Sorry, I can't answer right now. Please try again, or ask a team member.");
     }
