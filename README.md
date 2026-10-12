@@ -18,11 +18,12 @@ The project runs as a **staff preview**. It is a live, identical copy of the rea
 2. [How it works](#how-it-works)
 3. [File map](#file-map)
 4. [Run your own copy](#run-your-own-copy)
-5. [Making changes](#making-changes)
-6. [Troubleshooting](#troubleshooting)
-7. [How we built it](#how-we-built-it)
-8. [Known limits](#known-limits)
-9. [Ideas for what's next](#ideas-for-whats-next)
+5. [Connecting her business tools](#connecting-her-business-tools)
+6. [Making changes](#making-changes)
+7. [Troubleshooting](#troubleshooting)
+8. [How we built it](#how-we-built-it)
+9. [Known limits](#known-limits)
+10. [Ideas for what's next](#ideas-for-whats-next)
 
 ---
 
@@ -42,19 +43,22 @@ While it thinks, a pink lemon slice (from the store logo) spins next to rotating
 
 **3. A "Shop Insights" analytics page** (`/analytics`, linked in cursive at the top right of every page):
 - **Live data:** product and brand counts, % of sizes in stock, median price, items on sale, new arrivals, biggest brands, brands selling out fastest, weekly new arrivals, price mix, and a "restock watch" table of items with sold-out sizes.
-- **Sample data (clearly labeled):** monthly sales, new vs. returning customers, sales by location, top categories. These are placeholders until the store's Shopify admin data is connected (see [Ideas](#ideas-for-whats-next)).
+- **Sales & customers:** weekly sales (online vs. in store), new vs. returning customers, sales by location and top sellers. These show clearly labeled sample numbers until Shopify or Square is connected on the Connections tab, then switch to real ones.
 
 The page has a second tab, **SEO & marketing** (`/analytics#seo`):
 - **Search health (live):** checks every product page for a description, 2+ photos, photo alt text, a short title, tags and a product type, and scores the homepage basics (title, meta description, H1, share image, canonical link, structured data, local business info) with a tip for each fix.
 - **Fix these first (live):** in-stock products with the most gaps, so the effort goes where it can sell.
 - **Post ideas (live):** newest arrivals, items down to their last size, and items on sale, ready to share on Instagram and Facebook.
-- **Traffic & social (sample, clearly labeled):** visit sources, Instagram followers, email open rates and top Google searches. These need Google Analytics, Search Console and Meta access to become real.
+- **Traffic & social:** visit sources, Instagram and Facebook followers, newsletter open rates and top Google searches. These show sample numbers until Google, Instagram or Mailchimp is connected.
+
+The third tab, **Connections** (`/analytics#connections`), has a **Connect** button for each business tool: Shopify, Square, Google Analytics & Search Console, Instagram & Facebook, and Mailchimp. Pressing one opens that service's own sign-in page, the owner approves read-only access, and the matching charts switch to real numbers. It's locked behind a staff passcode. See [Connecting her business tools](#connecting-her-business-tools).
 
 **4. Safety rails.**
 - Cart, checkout and account pages are blocked, and add-to-cart buttons show a "staff preview" notice.
 - Search engines are told not to index the copy (`noindex` meta tag and `X-Robots-Tag` header), so it never competes with the real site on Google.
 - The Anthropic API key stays on the server and is never sent to the browser.
 - Each visitor is limited to 8 questions a minute, and conversation history is capped.
+- Connecting services and seeing real sales numbers needs the staff passcode. Keys from connected services are encrypted (AES-256-GCM) before they're stored and are never sent to the browser.
 
 ---
 
@@ -121,11 +125,16 @@ api/
   chat.js           Claude tool-use loop + /api/chat?check=1 health check
   analytics.js      Catalog statistics for the analytics page
   seo.js            SEO audit, homepage checks and post ideas for the SEO & marketing tab
+  connect.js        Connect buttons: sends the owner to each service's sign-in, saves the key it returns
+  admin.js          Staff passcode, list of connected services, disconnect
+  insights.js       Real sales, customers, traffic, social and email numbers from connected services
+  _lib/             Shared code (not endpoints): providers.js (each service's sign-in steps),
+                    auth.js (passcode, cookies, encryption), store.js (Upstash Redis storage)
 pl-assistant/
   widget.js         Chat bubble, Shop Insights link, preview banner, buy-blocking
   widget.css        Widget styles (scoped, theme-proof)
-  analytics.html    "Shop Insights" dashboard with two tabs (Chart.js)
-vercel.json         Routing: everything → proxy; /analytics → dashboard; noindex header
+  analytics.html    "Shop Insights" dashboard: Store & sales, SEO & marketing, Connections
+vercel.json         Routing: everything → proxy; /analytics → dashboard; /connect/* → connect.js; noindex header
 package.json        One dependency: @anthropic-ai/sdk
 streamlit-version/  Earlier prototype (see "How we built it"); ignored by Vercel
 ```
@@ -164,6 +173,42 @@ vercel dev           # http://localhost:3000
 ### Cost
 
 Each question costs roughly a few cents with Opus 5.5 at low effort, a bit more when Claude needs several lookups. To cut cost a lot (with somewhat simpler answers), change `model` in `api/chat.js` to `claude-haiku-5-5`. Vercel's free plan covers the hosting for this kind of traffic.
+
+---
+
+## Connecting her business tools
+
+The Connections tab works like the "Sign in with Google" buttons on other sites (OAuth). Each service needs a one-time setup so it knows this site is allowed to ask. After that, connecting is one click and an "Allow" on the service's own page.
+
+### One-time setup (do these first)
+
+1. **Staff passcode.** In Vercel → Settings → Environment Variables, add `ADMIN_PASSCODE` with a strong passcode. Only people who know it can connect services or see real sales numbers. Optionally add `APP_SECRET` (any long random string). It's used to encrypt stored keys, and if it's missing the passcode is used instead, so changing the passcode later disconnects everything.
+2. **Storage.** In Vercel → Storage, add **Upstash for Redis** (free tier) and connect it to this project. That adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` automatically.
+3. **Site address.** Add `PUBLIC_URL` with the site's main address, for example `https://pink-lemonade-assistant.vercel.app`. Each service checks that sign-ins return to exactly this address.
+4. **Redeploy** so the new variables take effect.
+
+### Each service
+
+For each one, create a free "app" in the service's developer site, set its **redirect / callback URL** to `PUBLIC_URL` + `/connect/<id>/callback`, and copy its ID and secret into Vercel. The Connections tab shows the exact callback address for each service, and marks a service "Setup needed" until its variables exist.
+
+| Service | `<id>` | Where to create the app | Vercel variables | Access requested (read-only) |
+|---|---|---|---|---|
+| Shopify | `shopify` | Shopify's developer dashboard / Partners (create an app, distribute it to her store only) | `SHOPIFY_CLIENT_ID`, `SHOPIFY_CLIENT_SECRET` | `read_orders`, `read_customers`, `read_products`, `read_inventory`, `read_locations` |
+| Square | `square` | developer.squareup.com → Applications → OAuth | `SQUARE_CLIENT_ID`, `SQUARE_CLIENT_SECRET` (`SQUARE_ENVIRONMENT=sandbox` to test) | orders, payments, customers, items, inventory, merchant profile |
+| Google Analytics & Search Console | `google` | console.cloud.google.com → APIs & Services: enable the *Google Analytics Data API*, *Google Analytics Admin API* and *Search Console API*, set up the OAuth consent screen, then create an OAuth client (Web application) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (optional `GA4_PROPERTY_ID`) | `analytics.readonly`, `webmasters.readonly` |
+| Instagram & Facebook | `meta` | developers.facebook.com → My Apps → create a Business app with Facebook Login | `META_APP_ID`, `META_APP_SECRET` (optional `META_GRAPH_VERSION`, default `v23.0`) | `pages_show_list`, `pages_read_engagement`, `instagram_basic`, `instagram_manage_insights` |
+| Mailchimp | `mailchimp` | Mailchimp → Account → Extras → Registered apps | `MAILCHIMP_CLIENT_ID`, `MAILCHIMP_CLIENT_SECRET` | campaign reports and list size |
+
+Notes:
+- **Shopify:** when connecting, type the store's `something.myshopify.com` address (find it in Shopify admin → Settings → Domains). Shopify shares the **last 60 days** of orders by default, which is why sales charts cover 8 weeks. Set `SHOPIFY_API_VERSION` if the default (`2026-07`) is ever retired.
+- **Instagram:** the Instagram account must be a Business or Creator account linked to a Facebook Page. Meta's 60-day key has to be reconnected about every two months.
+- **Google:** while the Google app is in "Testing" mode, add her Google account as a test user.
+- Real numbers are cached for 15 minutes. Connecting or disconnecting clears the cache.
+- These developer dashboards change often. If a menu name above doesn't match, search the service's docs for "OAuth app" or "redirect URL".
+
+### Adding another service
+
+Copy an entry in `api/_lib/providers.js` (its sign-in link, how to swap the returned code for a key, and optionally how to refresh the key), then add a fetcher in `api/insights.js` and a chart in `analytics.html`. Good candidates are Klaviyo, Google Business Profile (reviews), Lightspeed or Clover (if a store uses them) and QuickBooks.
 
 ---
 
@@ -214,7 +259,8 @@ This was built over a couple of days by iterating with Claude (Anthropic's AI) a
 ## Known limits
 
 - **Online stock only.** Public Shopify data shows whether a size is available online, not how many units, and not which of the four stores has it.
-- **Sales and customer charts are samples.** Real numbers need the Shopify Admin API (below).
+- **Sales and customer charts are samples until a service is connected.** Connecting needs the one-time developer-app setup above. The Connect flows were tested end to end against mock services, but not yet against the real Shopify, Square, Google, Meta or Mailchimp servers, so expect small fixes the first time each one is connected.
+- **New vs. returning customers** comes from Shopify only (Square orders don't say). "Returning" means the customer has more than one order on record.
 - **Rate limiting is per server instance.** It's a best-effort limit; the real safety net is the spend cap on the Anthropic account.
 - **Depends on the live site.** If pinklemonademi.com changes its theme drastically, the header-link placement falls back to a floating button, but other tweaks may be needed.
 - **No automated tests yet.** `summarize()`, `audit()`, `homepageChecks()`, `rewriteHtml()` and the chat `tools` are exported specifically so they can be unit tested.
@@ -225,9 +271,9 @@ This was built over a couple of days by iterating with Claude (Anthropic's AI) a
 
 These are good next steps for an internship project, roughly from most to least valuable:
 
-1. **Real sales and customer analytics.** In Shopify admin → *Settings → Apps → Develop apps*, create a custom app with read-only scopes (`read_orders`, `read_customers`, `read_products`, `read_inventory`), and store its token as a Vercel environment variable. Then replace the sample charts with real queries from the Shopify Admin GraphQL API. Never expose this token to the browser.
-2. **Real traffic and search data.** Connect Google Search Console (search terms, clicks, ranking positions) and Google Analytics 4 (visit sources, conversions) through their APIs with a service account, and replace the sample "Traffic & social" charts. The SEO tab's live audit (`api/seo.js`) is a good place to add more checks, such as broken links or slow pages.
-3. **Per-store inventory.** With `read_inventory` and `read_locations`, add a `check_store_stock` tool so the assistant can answer "Is this at the Grand Rapids store?"
+1. **Go live with the Connect buttons.** Do the one-time setup above for Shopify first, then Google. The code is written and tested with mock services, and connecting the real accounts is the first milestone. After that, extend the dashboards: year-over-year comparisons (Shopify's `read_all_orders` access gives more than 60 days), conversion rate from Google Analytics, and which Instagram posts drive website visits.
+2. **More SEO checks.** The SEO tab's live audit (`api/seo.js`) is a good place to add broken-link checks, page speed (Google's PageSpeed Insights API), and Search Console "pages not indexed" reports now that Google can be connected.
+3. **Per-store inventory.** The Shopify connection already asks for `read_inventory` and `read_locations`. Add a `check_store_stock` tool to `api/chat.js` so the assistant can answer "Is this at the Grand Rapids store?"
 4. **Question log and insights.** Save anonymized questions (for example in Vercel KV or a Google Sheet) to learn what shoppers ask for that the store doesn't carry. This would make a strong data-analysis piece.
 5. **Daily restock email** to the owner listing sold-out and low-stock items, using a Vercel Cron Job.
 6. **Evaluation and tests.** Build a set of 30–50 realistic questions with expected answers and score the assistant automatically. Add unit tests for the exported functions.

@@ -68,6 +68,24 @@ td .tip{display:block;color:var(--muted);font-size:12px}
 .idea-list b{display:block;font-weight:600;font-size:14px;line-height:1.3}
 .idea-list small{color:var(--muted)}
 @media (max-width:900px){.ideas{grid-template-columns:1fr}}
+.gate{display:flex;gap:8px;flex-wrap:wrap}
+.gate input,.shop-input{flex:1;min-width:180px;border:1px solid var(--line);border-radius:999px;padding:10px 14px;font:15px var(--body);color:var(--ink);background:var(--bg)}
+.btn,.gate button{background:var(--pink);color:#fff;border:0;border-radius:999px;padding:10px 18px;font:700 14px var(--body);cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:none;color:var(--pink);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.conn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.conn{display:flex;flex-direction:column;gap:10px}
+.conn .row{display:flex;align-items:center;gap:12px}
+.conn .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px;background:var(--blush);flex:none}
+.conn h2{font-size:18px}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pill.on{background:#e3f3ea;color:#1f6a43}.pill.off{background:var(--grid);color:var(--muted)}.pill.setup{background:var(--lemon);color:#3b2530}
+.conn .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.conn code{font-size:12px;background:var(--grid);border-radius:5px;padding:1px 5px;word-break:break-all}
+.banner{border-radius:14px;padding:12px 16px;font-weight:600;background:#e3f3ea;color:#1f6a43}
+.banner.err{background:#fbe3ea;color:#a2354f}
+.bigstat{display:flex;flex-wrap:wrap;gap:18px;padding-top:8px}
+.bigstat div{min-width:120px}.bigstat b{display:block;font-family:var(--display);font-size:30px;font-weight:400}.bigstat span{color:var(--muted);font-size:13px}
 a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
 </style>
 </head>
@@ -83,6 +101,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offs
   <nav class="wrap tabs" role="tablist" aria-label="Dashboard sections">
     <button class="tab" role="tab" id="t-store" aria-controls="tab-store" aria-selected="true">Store &amp; sales</button>
     <button class="tab" role="tab" id="t-seo" aria-controls="tab-seo" aria-selected="false">SEO &amp; marketing</button>
+    <button class="tab" role="tab" id="t-conn" aria-controls="tab-conn" aria-selected="false">Connections</button>
   </nav>
 </header>
 
@@ -99,13 +118,13 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offs
     <article class="card wide"><h2>Restock watch</h2><p class="sub">Items with the most sizes sold out online</p><div class="tablebox"><table><thead><tr><th>Item</th><th>Brand</th><th>Price</th><th>Sold out</th><th>Sizes left</th></tr></thead><tbody id="restock"><tr><td colspan="5" class="state">Loading…</td></tr></tbody></table></div></article>
   </section>
 
-  <div class="section-head"><h3>Sales &amp; customers</h3><span class="flag">Sample numbers</span></div>
-  <p class="note">These charts show what this section will look like. The numbers are made up. Real sales and customer figures live in her Shopify admin, and they can be connected with a read-only Shopify access key.</p>
-  <section class="grid sample">
-    <article class="card"><h2>Monthly sales</h2><p class="sub">Sample · online and in-store, 2026</p><div class="chart"><canvas id="s-sales" role="img" aria-label="Sample monthly sales"></canvas></div></article>
-    <article class="card"><h2>New vs returning customers</h2><p class="sub">Sample · orders per month</p><div class="chart"><canvas id="s-cust" role="img" aria-label="Sample new and returning customers"></canvas></div></article>
-    <article class="card"><h2>Sales by location</h2><p class="sub">Sample · share of September sales</p><div class="chart"><canvas id="s-loc" role="img" aria-label="Sample sales by location"></canvas></div></article>
-    <article class="card"><h2>Top categories</h2><p class="sub">Sample · September revenue</p><div class="chart"><canvas id="s-cat" role="img" aria-label="Sample revenue by category"></canvas></div></article>
+  <div class="section-head"><h3>Sales &amp; customers</h3><span class="flag" id="sales-flag">Sample numbers</span></div>
+  <p class="note" id="sales-note">These charts show what this section will look like. The numbers are made up. Connect Shopify or Square on the <a href="#connections" data-tab="conn">Connections</a> tab to see real sales and customers.</p>
+  <section class="grid sample" id="sales-grid">
+    <article class="card"><h2 id="s-sales-h">Monthly sales</h2><p class="sub" id="s-sales-sub">Sample · online and in-store, 2026</p><div class="chart"><canvas id="s-sales" role="img" aria-label="Sample monthly sales"></canvas></div></article>
+    <article class="card"><h2>New vs returning customers</h2><p class="sub" id="s-cust-sub">Sample · orders per month</p><div class="chart"><canvas id="s-cust" role="img" aria-label="Sample new and returning customers"></canvas></div></article>
+    <article class="card"><h2>Sales by location</h2><p class="sub" id="s-loc-sub">Sample · share of September sales</p><div class="chart"><canvas id="s-loc" role="img" aria-label="Sample sales by location"></canvas></div></article>
+    <article class="card"><h2 id="s-cat-h">Top categories</h2><p class="sub" id="s-cat-sub">Sample · September revenue</p><div class="chart"><canvas id="s-cat" role="img" aria-label="Sample revenue by category"></canvas></div></article>
   </section>
 </section>
 
@@ -128,14 +147,26 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offs
     <article class="card"><h2>On sale</h2><p class="sub">Marked-down items in stock</p><ul class="idea-list" id="idea-sale"><li class="state">Loading…</li></ul></article>
   </section>
 
-  <div class="section-head"><h3>Traffic &amp; social</h3><span class="flag">Sample numbers</span></div>
-  <p class="note">These charts show what this section will look like. The numbers are made up. Real figures come from Google Analytics, Google Search Console and Meta Business Suite, which can be connected later.</p>
+  <div class="section-head"><h3>Traffic &amp; social</h3><span class="flag" id="mkt-flag">Sample numbers</span></div>
+  <p class="note" id="mkt-note">These charts show what this section will look like. The numbers are made up. Connect Google, Instagram and Mailchimp on the <a href="#connections" data-tab="conn">Connections</a> tab to see real figures.</p>
   <section class="grid sample">
-    <article class="card"><h2>Where visitors come from</h2><p class="sub">Sample · share of website visits, September</p><div class="chart"><canvas id="m-sources" role="img" aria-label="Sample traffic sources"></canvas></div></article>
-    <article class="card"><h2>Instagram followers</h2><p class="sub">Sample · @pinklemonadegr, 2026</p><div class="chart"><canvas id="m-ig" role="img" aria-label="Sample Instagram followers"></canvas></div></article>
-    <article class="card"><h2>Email open rate</h2><p class="sub">Sample · last 6 newsletters</p><div class="chart"><canvas id="m-email" role="img" aria-label="Sample email open rates"></canvas></div></article>
-    <article class="card"><h2>Top Google searches</h2><p class="sub">Sample · searches that led to the site</p><div class="tablebox"><table><thead><tr><th>Search</th><th>Clicks</th><th>Position</th></tr></thead><tbody id="m-search"></tbody></table></div></article>
+    <article class="card"><h2>Where visitors come from</h2><p class="sub" id="m-sources-sub">Sample · share of website visits, September</p><div class="chart"><canvas id="m-sources" role="img" aria-label="Sample traffic sources"></canvas></div></article>
+    <article class="card" id="m-ig-card"><h2>Instagram followers</h2><p class="sub">Sample · @pinklemonadegr, 2026</p><div class="chart"><canvas id="m-ig" role="img" aria-label="Sample Instagram followers"></canvas></div></article>
+    <article class="card"><h2>Email open rate</h2><p class="sub" id="m-email-sub">Sample · last 6 newsletters</p><div class="chart"><canvas id="m-email" role="img" aria-label="Sample email open rates"></canvas></div></article>
+    <article class="card"><h2>Top Google searches</h2><p class="sub" id="m-search-sub">Sample · searches that led to the site</p><div class="tablebox"><table><thead><tr><th>Search</th><th>Clicks</th><th>Position</th></tr></thead><tbody id="m-search"></tbody></table></div></article>
   </section>
+</section>
+
+<section class="panel" id="tab-conn" role="tabpanel" aria-labelledby="t-conn" hidden>
+  <div class="section-head"><h3>Connect her business tools</h3></div>
+  <p class="note">Each Connect button opens that service's own sign-in page. She approves read-only access there, and the matching charts switch from sample numbers to real ones. Keys are encrypted and stay on the server. Only people with the staff passcode can see this tab's data.</p>
+  <div id="conn-gate" class="card" hidden>
+    <h2>Staff passcode</h2><p class="sub" id="gate-msg">Enter the passcode to connect services and see real sales numbers.</p>
+    <form id="gate-form" class="gate"><input id="gate-pass" type="password" autocomplete="current-password" placeholder="Passcode" aria-label="Staff passcode"><button type="submit">Unlock</button></form>
+  </div>
+  <div id="conn-banner" class="banner" hidden role="status"></div>
+  <section class="conn-grid" id="conn-list"><div class="state">Loading…</div></section>
+  <p class="note" id="conn-foot"></p>
 </section>
 </main>
 
@@ -230,7 +261,6 @@ sample();
 let seoLoaded = false;
 async function seo() {
   seoLoaded = true;
-  marketingSample();
   let d;
   try {
     const r = await fetch("/api/seo");
@@ -286,19 +316,132 @@ function marketingSample() {
   document.getElementById("m-search").innerHTML = searches.map(([q, c, pos]) => `<tr><td>${q}</td><td class="num">${c} <small>(sample)</small></td><td class="num">${pos}</td></tr>`).join("");
 }
 
+
+// ---------- Connections tab + real numbers ----------
+const LOGOS = { shopify: "🛍️", square: "◼️", google: "📈", meta: "📸", mailchimp: "✉️" };
+let connState = null;
+async function connections() {
+  const params = new URLSearchParams(location.search);
+  const banner = document.getElementById("conn-banner");
+  if (params.get("connected") || params.get("error")) {
+    banner.hidden = false;
+    banner.className = "banner" + (params.get("error") ? " err" : "");
+    banner.textContent = params.get("error") || "Connected! The charts will use the real numbers now.";
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+  try { connState = await (await fetch("/api/admin", { cache: "no-store" })).json(); } catch { connState = null; }
+  const list = document.getElementById("conn-list"), gate = document.getElementById("conn-gate");
+  if (!connState) { list.innerHTML = '<div class="state">Couldn\'t load connections. Refresh to try again.</div>'; return; }
+  gate.hidden = connState.admin;
+  if (!connState.passcode_set) document.getElementById("gate-msg").textContent = "No passcode is set yet. Add ADMIN_PASSCODE in Vercel (Settings → Environment Variables), then redeploy.";
+  list.innerHTML = connState.services.map((s) => {
+    const pill = !s.configured ? '<span class="pill setup">Setup needed</span>' : s.connected ? '<span class="pill on">Connected</span>' : '<span class="pill off">Not connected</span>';
+    let body = `<p class="sub">${esc(s.what)}</p>`;
+    if (s.connected) body += `<p class="sub">Signed in as <b>${esc(s.account || "—")}</b>${s.since ? " since " + new Date(s.since).toLocaleDateString() : ""}</p>`;
+    if (!s.configured) body += `<p class="sub">Add ${s.env.map((e) => `<code>${e}</code>`).join(" and ")} in Vercel. Sign-in return address: <code>${esc(connState.callback_base + s.id)}/callback</code></p>`;
+    if (s.error) body += `<p class="sub bad">${esc(s.error)}</p>`;
+    const can = connState.admin && s.configured && connState.storage_ready;
+    let actions = "";
+    if (s.connected) actions = `<button class="btn ghost" data-disconnect="${s.id}" ${connState.admin ? "" : "disabled"}>Disconnect</button>`;
+    else if (s.needs_shop) actions = `<form class="gate" data-shop-form="${s.id}"><input class="shop-input" name="shop" placeholder="your-store.myshopify.com" aria-label="Shopify store address" ${can ? "" : "disabled"}><button class="btn" ${can ? "" : "disabled"}>Connect</button></form>`;
+    else actions = can ? `<a class="btn" href="/connect/${s.id}">Connect ${esc(s.name.split(" ")[0])}</a>` : `<button class="btn" disabled>Connect</button>`;
+    return `<article class="card conn"><div class="row"><span class="logo" aria-hidden="true">${LOGOS[s.id] || "🔗"}</span><h2>${esc(s.name)}</h2>${pill}</div>${body}<div class="actions">${actions}</div></article>`;
+  }).join("");
+  document.getElementById("conn-foot").innerHTML = connState.admin
+    ? (connState.storage_ready ? '<a href="#" id="logout">Lock this browser</a>' : 'Storage isn\'t set up yet: in Vercel, open Storage → add <b>Upstash for Redis</b> and connect it to this project, then redeploy.')
+    : "";
+  const lo = document.getElementById("logout");
+  if (lo) lo.onclick = async (e) => { e.preventDefault(); await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "logout" }) }); location.reload(); };
+  list.querySelectorAll("[data-disconnect]").forEach((b) => b.onclick = async () => {
+    if (!confirm("Disconnect this service? The charts will go back to sample numbers.")) return;
+    await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "disconnect", provider: b.dataset.disconnect }) });
+    connections();
+  });
+  list.querySelectorAll("[data-shop-form]").forEach((f) => f.onsubmit = (e) => {
+    e.preventDefault();
+    location.href = `/connect/${f.dataset.shopForm}?shop=${encodeURIComponent(f.shop.value)}`;
+  });
+  if (connState.admin && connState.services.some((s) => s.connected)) realNumbers();
+}
+document.getElementById("gate-form").onsubmit = async (e) => {
+  e.preventDefault();
+  const r = await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "login", passcode: document.getElementById("gate-pass").value }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { document.getElementById("gate-msg").textContent = d.error || "That didn't work."; return; }
+  connections();
+};
+
+const redraw = (id) => { const c = window.Chart && Chart.getChart(id); if (c) c.destroy(); };
+const liveFlag = (id, text) => { const f = document.getElementById(id); f.textContent = text; f.className = "flag live"; };
+const setText = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+let realLoaded = false;
+async function realNumbers() {
+  if (realLoaded) return;
+  realLoaded = true;
+  let d;
+  try { const r = await fetch("/api/insights"); if (!r.ok) return; d = await r.json(); } catch { return; }
+  const problems = Object.entries(d.status || {}).filter(([, v]) => !v.ok).map(([k, v]) => `${k}: ${v.error}`);
+  if (problems.length) { const b = document.getElementById("conn-banner"); b.hidden = false; b.className = "banner err"; b.textContent = "Some services couldn't load: " + problems.join(" · "); }
+  if (!window.Chart) return;
+  const wk = (labels) => labels.map((l) => new Date(l + "T12:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+  if (d.commerce) {
+    const c = d.commerce;
+    liveFlag("sales-flag", "Live from " + c.from);
+    setText("sales-note", `Real numbers from ${c.from}: ${money(c.total)} across ${c.orders.toLocaleString()} orders in the last 8 weeks.`);
+    document.getElementById("sales-grid").classList.remove("sample");
+    setText("s-sales-h", "Weekly sales"); setText("s-sales-sub", "Online and in-store, last 8 weeks");
+    redraw("s-sales");
+    new Chart(document.getElementById("s-sales"), { type: "line",
+      data: { labels: wk(c.weeks), datasets: c.sales.map((s, i) => ({ label: s.label, data: s.data, borderColor: i ? C.gold : C.pink, backgroundColor: i ? C.gold : C.pink, borderWidth: 2, tension: .3, pointRadius: 3 })) },
+      options: { maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "top", align: "start" }, tooltip: { callbacks: { title: (i) => "Week ending " + i[0].label, label: (x) => `${x.dataset.label}: ${money(x.raw)}` } } }, scales: { x: noGrid, y: axis({ beginAtZero: true, ticks: { color: C.muted, callback: (v) => money(v) } }) } } });
+    if (c.customers) {
+      setText("s-cust-sub", "Orders per week, last 8 weeks");
+      redraw("s-cust");
+      new Chart(document.getElementById("s-cust"), { type: "bar",
+        data: { labels: wk(c.weeks), datasets: c.customers.map((s, i) => ({ label: s.label, data: s.data, backgroundColor: i ? C.gold : C.pink, borderRadius: 4, borderSkipped: "start", maxBarThickness: 26 })) },
+        options: { maintainAspectRatio: false, plugins: { legend: { position: "top", align: "start" } }, datasets: { bar: { borderColor: "#fff", borderWidth: { top: 2 } } }, scales: { x: { ...noGrid, stacked: true }, y: axis({ stacked: true, beginAtZero: true }) } } });
+    }
+    if (c.locations.length) { setText("s-loc-sub", "Share of sales, last 8 weeks"); redraw("s-loc"); bar("s-loc", c.locations.map((l) => l.label), c.locations.map((l) => l.value), { horizontal: true, fmt: (v) => v + "% of sales", tick: (v) => v + "%" }); }
+    if (c.products.length) { setText("s-cat-h", "Top sellers"); setText("s-cat-sub", "Revenue, last 8 weeks"); redraw("s-cat"); bar("s-cat", c.products.map((p) => p.label.length > 28 ? p.label.slice(0, 27) + "…" : p.label), c.products.map((p) => p.value), { horizontal: true, fmt: (v) => money(v), tick: (v) => money(v) }); }
+  }
+  const live = [];
+  if (d.google) {
+    live.push("Google");
+    if (d.google.sources.length) { setText("m-sources-sub", `Share of ${d.google.sessions.toLocaleString()} visits, last 28 days`); redraw("m-sources"); bar("m-sources", d.google.sources.map((s) => s.label), d.google.sources.map((s) => s.value), { horizontal: true, fmt: (v) => v + "% of visits", tick: (v) => v + "%" }); }
+    if (d.google.searches.length) { setText("m-search-sub", "Searches that led to the site, last 28 days"); document.getElementById("m-search").innerHTML = d.google.searches.map((q) => `<tr><td>${esc(q.query)}</td><td class="num">${q.clicks}</td><td class="num">${q.position}</td></tr>`).join(""); }
+  }
+  if (d.social && d.social.length) {
+    live.push("Instagram");
+    redraw("m-ig");
+    document.getElementById("m-ig-card").innerHTML = `<h2>Instagram & Facebook</h2><p class="sub">Right now</p>` + d.social.map((a) =>
+      `<div class="bigstat">${a.instagram ? `<div><b>${(a.followers ?? 0).toLocaleString()}</b><span>@${esc(a.instagram)} followers</span></div><div><b>${(a.posts ?? 0).toLocaleString()}</b><span>Instagram posts</span></div>` : ""}${a.page_fans != null ? `<div><b>${a.page_fans.toLocaleString()}</b><span>${esc(a.page)} page likes</span></div>` : ""}</div>`).join("");
+  }
+  if (d.email && d.email.campaigns.length) {
+    live.push("Mailchimp");
+    setText("m-email-sub", `Last ${d.email.campaigns.length} newsletters · ${d.email.subscribers.toLocaleString()} subscribers`);
+    redraw("m-email");
+    bar("m-email", d.email.campaigns.map((c) => c.label.length > 22 ? c.label.slice(0, 21) + "…" : c.label), d.email.campaigns.map((c) => c.open_rate), { color: C.gold, fmt: (v) => v + "% opened", tick: (v) => v + "%" });
+  }
+  if (live.length) { liveFlag("mkt-flag", "Live from " + live.join(", ")); setText("mkt-note", "Charts marked Sample still use made-up numbers until that service is connected."); }
+}
 // ---------- tabs ----------
 function show(which) {
-  for (const [id, panel] of [["t-store", "tab-store"], ["t-seo", "tab-seo"]]) {
+  for (const [id, panel] of [["t-store", "tab-store"], ["t-seo", "tab-seo"], ["t-conn", "tab-conn"]]) {
     const on = panel === "tab-" + which;
     document.getElementById(id).setAttribute("aria-selected", String(on));
     document.getElementById(panel).hidden = !on;
   }
   if (which === "seo" && !seoLoaded) seo();
-  history.replaceState(null, "", which === "seo" ? "#seo" : location.pathname);
+  history.replaceState(null, "", which === "store" ? location.pathname + location.search : "#" + (which === "conn" ? "connections" : which));
 }
 document.getElementById("t-store").onclick = () => show("store");
 document.getElementById("t-seo").onclick = () => show("seo");
+document.getElementById("t-conn").onclick = () => show("conn");
+document.querySelectorAll("[data-tab]").forEach((a) => a.onclick = (e) => { e.preventDefault(); show(a.dataset.tab); });
+marketingSample();
+connections(); // also swaps in real numbers when services are connected and the passcode was entered
 if (location.hash === "#seo") show("seo");
+if (location.hash === "#connections") show("conn");
 
 </script>
 </body>
