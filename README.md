@@ -44,6 +44,12 @@ While it thinks, a pink lemon slice (from the store logo) spins next to rotating
 - **Live data:** product and brand counts, % of sizes in stock, median price, items on sale, new arrivals, biggest brands, brands selling out fastest, weekly new arrivals, price mix, and a "restock watch" table of items with sold-out sizes.
 - **Sample data (clearly labeled):** monthly sales, new vs. returning customers, sales by location, top categories. These are placeholders until the store's Shopify admin data is connected (see [Ideas](#ideas-for-whats-next)).
 
+The page has a second tab, **SEO & marketing** (`/analytics#seo`):
+- **Search health (live):** checks every product page for a description, 2+ photos, photo alt text, a short title, tags and a product type, and scores the homepage basics (title, meta description, H1, share image, canonical link, structured data, local business info) with a tip for each fix.
+- **Fix these first (live):** in-stock products with the most gaps, so the effort goes where it can sell.
+- **Post ideas (live):** newest arrivals, items down to their last size, and items on sale, ready to share on Instagram and Facebook.
+- **Traffic & social (sample, clearly labeled):** visit sources, Instagram followers, email open rates and top Google searches. These need Google Analytics, Search Console and Meta access to become real.
+
 **4. Safety rails.**
 - Cart, checkout and account pages are blocked, and add-to-cart buttons show a "staff preview" notice.
 - Search engines are told not to index the copy (`noindex` meta tag and `X-Robots-Tag` header), so it never competes with the real site on Google.
@@ -114,10 +120,11 @@ api/
   proxy.js          Live mirror of the store, adds the widget to every page
   chat.js           Claude tool-use loop + /api/chat?check=1 health check
   analytics.js      Catalog statistics for the analytics page
+  seo.js            SEO audit, homepage checks and post ideas for the SEO & marketing tab
 pl-assistant/
   widget.js         Chat bubble, Shop Insights link, preview banner, buy-blocking
   widget.css        Widget styles (scoped, theme-proof)
-  analytics.html    "Shop Insights" dashboard (Chart.js)
+  analytics.html    "Shop Insights" dashboard with two tabs (Chart.js)
 vercel.json         Routing: everything → proxy; /analytics → dashboard; noindex header
 package.json        One dependency: @anthropic-ai/sdk
 streamlit-version/  Earlier prototype (see "How we built it"); ignored by Vercel
@@ -210,7 +217,7 @@ This was built over a couple of days by iterating with Claude (Anthropic's AI) a
 - **Sales and customer charts are samples.** Real numbers need the Shopify Admin API (below).
 - **Rate limiting is per server instance.** It's a best-effort limit; the real safety net is the spend cap on the Anthropic account.
 - **Depends on the live site.** If pinklemonademi.com changes its theme drastically, the header-link placement falls back to a floating button, but other tweaks may be needed.
-- **No automated tests yet.** `summarize()`, `rewriteHtml()` and the chat `tools` are exported specifically so they can be unit tested.
+- **No automated tests yet.** `summarize()`, `audit()`, `homepageChecks()`, `rewriteHtml()` and the chat `tools` are exported specifically so they can be unit tested.
 
 ---
 
@@ -219,12 +226,13 @@ This was built over a couple of days by iterating with Claude (Anthropic's AI) a
 These are good next steps for an internship project, roughly from most to least valuable:
 
 1. **Real sales and customer analytics.** In Shopify admin → *Settings → Apps → Develop apps*, create a custom app with read-only scopes (`read_orders`, `read_customers`, `read_products`, `read_inventory`), and store its token as a Vercel environment variable. Then replace the sample charts with real queries from the Shopify Admin GraphQL API. Never expose this token to the browser.
-2. **Per-store inventory.** With `read_inventory` and `read_locations`, add a `check_store_stock` tool so the assistant can answer "Is this at the Grand Rapids store?"
-3. **Question log and insights.** Save anonymized questions (for example in Vercel KV or a Google Sheet) to learn what shoppers ask for that the store doesn't carry. This would make a strong data-analysis piece.
-4. **Daily restock email** to the owner listing sold-out and low-stock items, using a Vercel Cron Job.
-5. **Evaluation and tests.** Build a set of 30–50 realistic questions with expected answers and score the assistant automatically. Add unit tests for the exported functions.
-6. **Ship it on the real site.** Package the widget as a Shopify theme app extension (app embed) so it runs on pinklemonademi.com itself, with cart actions turned back on.
-7. **Accessibility and multilingual support:** keyboard and screen-reader testing for the widget, and answering in the shopper's language.
+2. **Real traffic and search data.** Connect Google Search Console (search terms, clicks, ranking positions) and Google Analytics 4 (visit sources, conversions) through their APIs with a service account, and replace the sample "Traffic & social" charts. The SEO tab's live audit (`api/seo.js`) is a good place to add more checks, such as broken links or slow pages.
+3. **Per-store inventory.** With `read_inventory` and `read_locations`, add a `check_store_stock` tool so the assistant can answer "Is this at the Grand Rapids store?"
+4. **Question log and insights.** Save anonymized questions (for example in Vercel KV or a Google Sheet) to learn what shoppers ask for that the store doesn't carry. This would make a strong data-analysis piece.
+5. **Daily restock email** to the owner listing sold-out and low-stock items, using a Vercel Cron Job.
+6. **Evaluation and tests.** Build a set of 30–50 realistic questions with expected answers and score the assistant automatically. Add unit tests for the exported functions.
+7. **Ship it on the real site.** Package the widget as a Shopify theme app extension (app embed) so it runs on pinklemonademi.com itself, with cart actions turned back on.
+8. **Accessibility and multilingual support:** keyboard and screen-reader testing for the widget, and answering in the shopper's language.
 
 ---
 

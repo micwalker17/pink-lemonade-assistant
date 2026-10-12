@@ -52,6 +52,22 @@ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .note{color:var(--muted);font-size:13px;max-width:70ch;margin:0}
 .state{color:var(--muted);padding:30px;text-align:center}
 @media (max-width:760px){.grid{grid-template-columns:1fr}.chart{height:240px}}
+.tabs{display:flex;gap:6px;padding-bottom:0;margin-top:-4px}
+.tab{font:700 14px var(--body);color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--pink);border-bottom-color:var(--pink)}
+.tab:hover{color:var(--pink)}
+.panel{display:flex;flex-direction:column;gap:22px}
+.panel[hidden]{display:none}
+.ok{color:#1f6a43;font-weight:700}.bad{color:#a2354f;font-weight:700}
+td .tip{display:block;color:var(--muted);font-size:12px}
+.issue{display:inline-block;font-size:11px;background:var(--blush);color:var(--pink);border-radius:5px;padding:1px 6px;margin:1px}
+.ideas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.idea-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.idea-list a{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--ink)}
+.idea-list img{width:48px;height:48px;object-fit:cover;border-radius:10px;background:var(--blush);flex:none}
+.idea-list b{display:block;font-weight:600;font-size:14px;line-height:1.3}
+.idea-list small{color:var(--muted)}
+@media (max-width:900px){.ideas{grid-template-columns:1fr}}
 a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offset:2px}
 </style>
 </head>
@@ -64,9 +80,14 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offs
     </div>
     <a class="back" href="/">← Back to the shop</a>
   </div>
+  <nav class="wrap tabs" role="tablist" aria-label="Dashboard sections">
+    <button class="tab" role="tab" id="t-store" aria-controls="tab-store" aria-selected="true">Store &amp; sales</button>
+    <button class="tab" role="tab" id="t-seo" aria-controls="tab-seo" aria-selected="false">SEO &amp; marketing</button>
+  </nav>
 </header>
 
 <main class="wrap">
+<section class="panel" id="tab-store" role="tabpanel" aria-labelledby="t-store">
   <div class="section-head"><h3>Catalog right now</h3><span class="flag live">Live from the website</span></div>
   <section class="tiles" id="tiles" aria-label="Headline numbers"><div class="state">Loading…</div></section>
 
@@ -86,6 +107,36 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--lemon);outline-offs
     <article class="card"><h2>Sales by location</h2><p class="sub">Sample · share of September sales</p><div class="chart"><canvas id="s-loc" role="img" aria-label="Sample sales by location"></canvas></div></article>
     <article class="card"><h2>Top categories</h2><p class="sub">Sample · September revenue</p><div class="chart"><canvas id="s-cat" role="img" aria-label="Sample revenue by category"></canvas></div></article>
   </section>
+</section>
+
+<section class="panel" id="tab-seo" role="tabpanel" aria-labelledby="t-seo" hidden>
+  <div class="section-head"><h3>Search health</h3><span class="flag live">Live from the website</span></div>
+  <p class="note">How easy the site is for Google to understand. Every product page is checked for a description, photos, alt text (the hidden photo captions Google reads), a tidy title and tags.</p>
+  <section class="tiles" id="seo-tiles" aria-label="SEO headline numbers"><div class="state">Checking the website…</div></section>
+  <section class="grid">
+    <article class="card"><h2>Product page checks</h2><p class="sub">Share of products that pass each check</p><div class="chart"><canvas id="seo-checks" role="img" aria-label="Share of products passing each SEO check"></canvas></div></article>
+    <article class="card"><h2>Pages Google can find</h2><p class="sub">Pages listed in the site's sitemap, by kind</p><div class="chart"><canvas id="seo-pages" role="img" aria-label="Pages in the sitemap by kind"></canvas></div></article>
+    <article class="card wide"><h2>Homepage checklist</h2><p class="sub">The basics Google looks for on the front page</p><div class="tablebox"><table><thead><tr><th>Check</th><th>Found</th><th></th></tr></thead><tbody id="seo-home"><tr><td colspan="3" class="state">Loading…</td></tr></tbody></table></div></article>
+    <article class="card wide"><h2>Fix these first</h2><p class="sub">In-stock products with the most gaps. Edit them in Shopify admin → Products.</p><div class="tablebox"><table><thead><tr><th>Item</th><th>Brand</th><th>What to fix</th></tr></thead><tbody id="seo-fix"><tr><td colspan="3" class="state">Loading…</td></tr></tbody></table></div></article>
+  </section>
+
+  <div class="section-head"><h3>Post ideas for this week</h3><span class="flag live">Live from the website</span></div>
+  <p class="note">Ready-made picks for Instagram and Facebook, pulled from the catalog right now.</p>
+  <section class="ideas">
+    <article class="card"><h2>Just arrived</h2><p class="sub">Newest items in stock</p><ul class="idea-list" id="idea-new"><li class="state">Loading…</li></ul></article>
+    <article class="card"><h2>Almost gone</h2><p class="sub">Last size left, great for "grab it now" posts</p><ul class="idea-list" id="idea-gone"><li class="state">Loading…</li></ul></article>
+    <article class="card"><h2>On sale</h2><p class="sub">Marked-down items in stock</p><ul class="idea-list" id="idea-sale"><li class="state">Loading…</li></ul></article>
+  </section>
+
+  <div class="section-head"><h3>Traffic &amp; social</h3><span class="flag">Sample numbers</span></div>
+  <p class="note">These charts show what this section will look like. The numbers are made up. Real figures come from Google Analytics, Google Search Console and Meta Business Suite, which can be connected later.</p>
+  <section class="grid sample">
+    <article class="card"><h2>Where visitors come from</h2><p class="sub">Sample · share of website visits, September</p><div class="chart"><canvas id="m-sources" role="img" aria-label="Sample traffic sources"></canvas></div></article>
+    <article class="card"><h2>Instagram followers</h2><p class="sub">Sample · @pinklemonadegr, 2026</p><div class="chart"><canvas id="m-ig" role="img" aria-label="Sample Instagram followers"></canvas></div></article>
+    <article class="card"><h2>Email open rate</h2><p class="sub">Sample · last 6 newsletters</p><div class="chart"><canvas id="m-email" role="img" aria-label="Sample email open rates"></canvas></div></article>
+    <article class="card"><h2>Top Google searches</h2><p class="sub">Sample · searches that led to the site</p><div class="tablebox"><table><thead><tr><th>Search</th><th>Clicks</th><th>Position</th></tr></thead><tbody id="m-search"></tbody></table></div></article>
+  </section>
+</section>
 </main>
 
 <script>
@@ -175,6 +226,80 @@ function sample() {
 
 live();
 sample();
+// ---------- SEO & marketing tab (loads the first time it's opened) ----------
+let seoLoaded = false;
+async function seo() {
+  seoLoaded = true;
+  marketingSample();
+  let d;
+  try {
+    const r = await fetch("/api/seo");
+    if (!r.ok) throw new Error();
+    d = await r.json();
+  } catch {
+    document.getElementById("seo-tiles").innerHTML = '<div class="state">The website check couldn\'t run right now. Refresh to try again.</div>';
+    return;
+  }
+  const t = d.totals;
+  const pages = Object.values(d.sitemap || {}).reduce((a, b) => a + b, 0);
+  const tiles = [
+    ["SEO-ready products", t.seo_ready_pct + "%", "pass every check"],
+    ["Photos with alt text", t.images_alt_pct + "%", `of ${t.images.toLocaleString()} product photos`],
+    ["No description", t.no_description.toLocaleString(), "products"],
+    ["Short descriptions", t.short_description.toLocaleString(), "under 25 words"],
+    ["Long titles", t.long_titles.toLocaleString(), "over 70 characters"],
+    ["Pages Google can find", pages ? pages.toLocaleString() : "–", "in the sitemap"],
+  ];
+  document.getElementById("seo-tiles").innerHTML = tiles.map(([k, v, s]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join("");
+  if (window.Chart) {
+    bar("seo-checks", d.checks.map((c) => c.label), d.checks.map((c) => c.pass_pct), { horizontal: true, fmt: (v) => v + "% of products pass", tick: (v) => v + "%" });
+    const names = { products: "Products", collections: "Collections", pages: "Info pages", blogs: "Blog posts" };
+    const kinds = Object.entries(d.sitemap || {}).sort((a, b) => b[1] - a[1]);
+    if (kinds.length) bar("seo-pages", kinds.map(([k]) => names[k] || k), kinds.map(([, v]) => v), { horizontal: true, color: C.gold, fmt: (v) => v + " pages" });
+  }
+  document.getElementById("seo-home").innerHTML = d.homepage.map((c) =>
+    `<tr><td>${esc(c.check)}${c.ok ? "" : `<span class="tip">${esc(c.tip)}</span>`}</td><td>${esc(c.detail)}</td><td class="${c.ok ? "ok" : "bad"}">${c.ok ? "✓ Good" : "✗ Fix"}</td></tr>`).join("");
+  document.getElementById("seo-fix").innerHTML = d.fix_first.length ? d.fix_first.map((r) =>
+    `<tr><td><a href="${esc(r.path)}">${esc(r.title)}</a></td><td>${esc(r.brand)}</td><td>${r.issues.map((i) => `<span class="issue">${esc(i)}</span>`).join("")}</td></tr>`).join("")
+    : '<tr><td colspan="3" class="state">Every in-stock product passes. Lovely!</td></tr>';
+  const list = (id, items, empty) => {
+    document.getElementById(id).innerHTML = items.length ? items.map((p) =>
+      `<li><a href="${esc(p.path)}"><img src="${esc(p.image ? p.image + (p.image.includes("?") ? "&" : "?") + "width=120" : "")}" alt="" loading="lazy"><span><b>${esc(p.title)}</b><small>${esc(p.brand)} · $${Number(p.price).toFixed(2)}</small></span></a></li>`).join("")
+      : `<li class="state">${empty}</li>`;
+  };
+  list("idea-new", d.post_ideas.new_arrivals, "Nothing new this week.");
+  list("idea-gone", d.post_ideas.almost_gone, "Nothing down to its last size.");
+  list("idea-sale", d.post_ideas.on_sale, "Nothing on sale right now.");
+}
+
+function marketingSample() {
+  if (window.Chart) {
+    bar("m-sources", ["Instagram", "Google search", "Direct", "Facebook", "Email", "Other"], [34, 27, 18, 11, 7, 3], { horizontal: true, fmt: (v) => v + "% of visits (sample)", tick: (v) => v + "%" });
+    new Chart(document.getElementById("m-ig"), {
+      type: "line",
+      data: { labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"], datasets: [{ data: [18200, 18500, 18900, 19400, 20100, 20500, 20800, 21400, 22100], borderColor: C.pink, backgroundColor: "rgba(194,65,107,.12)", fill: true, tension: .3, borderWidth: 2, pointRadius: 3, pointBackgroundColor: C.pink }] },
+      options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => c.raw.toLocaleString() + " followers (sample)" } } }, scales: { x: noGrid, y: axis({ ticks: { color: C.muted, callback: (v) => v / 1000 + "k" } }) } },
+    });
+    bar("m-email", ["Back to school", "Fall arrivals", "Jellycat drop", "Labor Day sale", "Halloween", "Holiday preview"], [41, 38, 52, 45, 39, 47], { color: C.gold, fmt: (v) => v + "% opened (sample)", tick: (v) => v + "%" });
+  }
+  const searches = [["pink lemonade grand rapids", 412, 1.2], ["kids boutique grand rapids", 138, 3.4], ["jellycat near me", 96, 5.8], ["baby gifts grand rapids", 71, 4.1], ["pink lemonade boutique", 64, 1.0], ["rylee and cru", 33, 9.6]];
+  document.getElementById("m-search").innerHTML = searches.map(([q, c, pos]) => `<tr><td>${q}</td><td class="num">${c} <small>(sample)</small></td><td class="num">${pos}</td></tr>`).join("");
+}
+
+// ---------- tabs ----------
+function show(which) {
+  for (const [id, panel] of [["t-store", "tab-store"], ["t-seo", "tab-seo"]]) {
+    const on = panel === "tab-" + which;
+    document.getElementById(id).setAttribute("aria-selected", String(on));
+    document.getElementById(panel).hidden = !on;
+  }
+  if (which === "seo" && !seoLoaded) seo();
+  history.replaceState(null, "", which === "seo" ? "#seo" : location.pathname);
+}
+document.getElementById("t-store").onclick = () => show("store");
+document.getElementById("t-seo").onclick = () => show("seo");
+if (location.hash === "#seo") show("seo");
+
 </script>
 </body>
 </html>
