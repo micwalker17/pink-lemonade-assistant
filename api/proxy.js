@@ -21,8 +21,9 @@ function rewriteHtml(html) {
   // Links to her own domain become links within this copy (assets keep loading from her CDN).
   const own = new RegExp(`(href=["'])(?:https?:)?//(?:www\\.)?${esc}(?=[/"'?#])`, "gi");
   html = html.replace(/<a\b[^>]*>/gi, (tag) => labelEmptyLink(tag.replace(own, "$1").replace(/(href=["'])(?=["'])/i, "$1/")));
-  // Shopify's performance beacon posts to her real domain, which the browser blocks from this copy.
-  html = html.replace(/data-shs-beacon=(["'])true\1/gi, 'data-shs-beacon="false"').replace(/\s*data-shs-beacon-endpoint=(["'])[^"']*\1/gi, "");
+  // Shopify's performance beacon posts to her real domain, which the browser blocks from this copy;
+  // point it at /api/collect here, which accepts and drops it.
+  html = html.replace(new RegExp(`(data-shs-beacon-endpoint=["'])https?://(?:www\\.)?${esc}(?=/)`, "gi"), "$1");
   html = html.replace(/(<form[^>]*action=["'])(?:https?:)?\/\/(?:www\.)?[^"']*?(\/cart)/gi, "$1$2");
   const v = (process.env.VERCEL_GIT_COMMIT_SHA || "dev").slice(0, 7); // new version on every deploy, so browsers drop old copies
   const head = `<meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/pl-assistant/widget.css?v=${v}">`;
